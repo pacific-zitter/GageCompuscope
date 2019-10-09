@@ -23,7 +23,6 @@ end
 function get_configs!(g::GageCard)
     st = CsGet(g, g.acquisition_config)
     st < 1 && error("error getting acquisition_config: " * CsGetErrorString(st))
-    @info g.channel_configs
     for chnl in g.channel_configs
         CsGet(g, chnl)
     end
@@ -41,14 +40,13 @@ function GageCard(board_index)
     gage.gagehandle = Int(m[])
     get_systeminfo!(gage)
     gage.acquisition_config = CSACQUISITIONCONFIG()
-    gage.channel_configs = Vector{CSCHANNELCONFIG}(
-        undef,
-        gage.systeminfo.ChannelCount,
-    )
-    gage.trigger_configs = Vector{CSTRIGGERCONFIG}(
-        undef,
-        gage.systeminfo.TriggerMachineCount,
-    )
+
+    gage.channel_configs = CSCHANNELCONFIG[]
+    [push!(gage.channel_configs, CSCHANNELCONFIG(Int(i))) for i in gage.systeminfo.ChannelCount]
+
+    gage.trigger_configs = CSTRIGGERCONFIG[]
+    [push!(gage.trigger_configs, CSTRIGGERCONFIG(Int(i))) for i in gage.systeminfo.TriggerMachineCount]
+
     get_configs!(gage)
 
     return gage
