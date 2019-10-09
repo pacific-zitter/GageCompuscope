@@ -1,4 +1,4 @@
-
+#TODO: REFACTOR ALL THIS CODE INTO GAGECARD.JL AND ENCAPSULATE GLOBALS.
 #-------------------------------------------------------------------------------
 const system_info = CSSYSTEMINFO()
 const acquisition_config = CSACQUISITIONCONFIG()
@@ -146,7 +146,12 @@ function gage_transfer_async()
     @inbounds for (i, p) in enumerate(eachcol(ddb))
         inp.Segment = i
         inp.pDataBuffer = pointer(p)
-        LibGage.CsTransferAS(GageCompuscope.gagehandle[], inp, outp, Ref(Int32(0)))
+        LibGage.CsTransferAS(
+            GageCompuscope.gagehandle[],
+            inp,
+            outp,
+            Ref(Int32(0)),
+        )
     end
     ddb
 end
