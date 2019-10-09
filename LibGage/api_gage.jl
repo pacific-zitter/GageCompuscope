@@ -1,10 +1,12 @@
 <<<<<<< HEAD
 include("defines_gage.jl")
 include("common_gage.jl")
-const _csget = (CSACQUISITIONCONFIG=CS_ACQUISITION,
-                        CSTRIGGERCONFIG=CS_TRIGGER,
-                        CSCHANNELCONFIG=CS_CHANNEL,
-                        CSSYSTEMINFO=CS_BOARD_INFO)
+const _csget = (
+    CSACQUISITIONCONFIG = CS_ACQUISITION,
+    CSTRIGGERCONFIG = CS_TRIGGER,
+    CSCHANNELCONFIG = CS_CHANNEL,
+    CSSYSTEMINFO = CS_BOARD_INFO,
+)
 
 function CsInitialize()
     ccall((:CsInitialize, :CsSsm), Int32, ())
@@ -46,8 +48,7 @@ function CsGet(hSystem, nIndex, nConfig, pData::T) where {T}
 end
 
 function CsGet(hSystem, pData::T) where {T}
-    G = typeof(pData) |> Symbol
-    @show G
+    G = typeof(pData) |> (x,) -> split(string(x), '.')[end] |> Symbol
     idx = getfield(_csget, G)
     ccall(
         (:CsGet, :CsSsm),
@@ -60,12 +61,7 @@ function CsGet(hSystem, pData::T) where {T}
     )
 end
 
-
-
-function CsSet(nIndex, pData::T) where T
-    global gagehandle
-    hSystem = gagehandle[]
-    pData.Size = sizeof(typeof(pData))
+function CsSet(hSystem, nIndex, pData::T) where {T}
     ccall(
         (:CsSet, :CsSsm),
         Int32,
@@ -74,18 +70,6 @@ function CsSet(nIndex, pData::T) where T
         nIndex,
         pData,
     )
-end
-function set_config(cfg)
-    T = typeof(cfg)
-    nidx = 0xff
-    if T <: CSACQUISITIONCONFIG
-        nidx = CS_ACQUISITION
-    elseif T <: CSTRIGGERCONFIG
-        nidx = CS_TRIGGER
-    elseif T <: CSCHANNELCONFIG
-        nidx = CS_CHANNEL
-    end
-    CsSet(nidx, cfg)
 end
 
 function CsGetSystemInfo(hSystem, pSystemInfo)
@@ -98,8 +82,6 @@ function CsGetSystemInfo(hSystem, pSystemInfo)
     )
 end
 CsGetSystemInfo(info) = CsGetSystemInfo(gagehandle[], info)
-
-
 
 function CsGetSystemCaps(hSystem, CapsId, pBuffer, BufferSize)
     ccall(

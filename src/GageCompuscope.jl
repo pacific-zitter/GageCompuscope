@@ -7,7 +7,8 @@ using .LibGage
 
 include("gagecard.jl")
 
-export GageCard, get_configs!, get_systeminfo!, free_system
+export GageCard, Transfer, get_configs!, get_systeminfo!, free_system, start
+export acquire, set_segmentsize
 
 end
 =======

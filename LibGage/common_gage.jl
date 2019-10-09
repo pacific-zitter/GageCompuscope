@@ -79,12 +79,11 @@ mutable struct CSSYSTEMINFO
     BoardCount::UInt32
 end
 
-CSSYSTEMINFO() =
-    begin
-        o = CSSYSTEMINFO(zeros(7)..., ntuple(x -> 0, 32), zeros(5)...)
-        o.Size = sizeof(CSSYSTEMINFO)
-        return o
-    end
+CSSYSTEMINFO() = begin
+    o = CSSYSTEMINFO(zeros(7)..., ntuple(x -> 0, 32), zeros(5)...)
+    o.Size = sizeof(CSSYSTEMINFO)
+    return o
+end
 
 
 const PCSSYSTEMINFO = Ptr{CSSYSTEMINFO}
@@ -110,12 +109,11 @@ mutable struct CSACQUISITIONCONFIG
     # SegmentCountHigh::Int32
 end
 
-CSACQUISITIONCONFIG() =
-    begin
-        o = CSACQUISITIONCONFIG(zeros(fieldcount(CSACQUISITIONCONFIG))...)
-        o.Size = sizeof(CSACQUISITIONCONFIG)
-        return o
-    end
+CSACQUISITIONCONFIG() = begin
+    o = CSACQUISITIONCONFIG(zeros(fieldcount(CSACQUISITIONCONFIG))...)
+    o.Size = sizeof(CSACQUISITIONCONFIG)
+    return o
+end
 
 const PCSACQUISITIONCONFIG = Ptr{CSACQUISITIONCONFIG}
 
@@ -129,13 +127,12 @@ mutable struct CSCHANNELCONFIG
     DcOffset::Int32
     Calib::Int32
 end
-CSCHANNELCONFIG(channel) =
-    begin
-        o = CSCHANNELCONFIG(zeros(fieldcount(CSCHANNELCONFIG))...)
-        o.Size = sizeof(CSCHANNELCONFIG)
-        o.ChannelIndex = channel
-        return o
-    end
+CSCHANNELCONFIG(channel) = begin
+    o = CSCHANNELCONFIG(zeros(fieldcount(CSCHANNELCONFIG))...)
+    o.Size = sizeof(CSCHANNELCONFIG)
+    o.ChannelIndex = channel
+    return o
+end
 const PCSCHANNELCONFIG = Ptr{CSCHANNELCONFIG}
 
 mutable struct ARRAY_CHANNELCONFIG
@@ -159,13 +156,12 @@ mutable struct CSTRIGGERCONFIG
     Filter::UInt32
     Relation::UInt32
 end
-CSTRIGGERCONFIG(number) =
-    begin
-        o = CSTRIGGERCONFIG(zeros(fieldcount(CSTRIGGERCONFIG))...)
-        o.Size = sizeof(CSTRIGGERCONFIG)
-        o.TriggerIndex = number
-        return o
-    end
+CSTRIGGERCONFIG(number) = begin
+    o = CSTRIGGERCONFIG(zeros(fieldcount(CSTRIGGERCONFIG))...)
+    o.Size = sizeof(CSTRIGGERCONFIG)
+    o.TriggerIndex = number
+    return o
+end
 
 const PCSTRIGGERCONFIG = Ptr{CSTRIGGERCONFIG}
 
@@ -232,7 +228,7 @@ mutable struct IN_PARAMS_TRANSFERDATA
     pDataBuffer::Ptr{Cvoid}
     hNotifyEvent::Ptr{Ptr{Cvoid}}
 end
-
+IN_PARAMS_TRANSFERDATA() = IN_PARAMS_TRANSFERDATA(0,0,0,0,0,Ptr{Cvoid}(),C_NULL)
 const PIN_PARAMS_TRANSFERDATA = Ptr{IN_PARAMS_TRANSFERDATA}
 
 mutable struct OUT_PARAMS_TRANSFERDATA
@@ -241,6 +237,7 @@ mutable struct OUT_PARAMS_TRANSFERDATA
     LowPart::Int32
     HighPart::Int32
 end
+OUT_PARAMS_TRANSFERDATA() = OUT_PARAMS_TRANSFERDATA(0, 0, 0, 0)
 
 const POUT_PARAMS_TRANSFERDATA = Ptr{OUT_PARAMS_TRANSFERDATA}
 
