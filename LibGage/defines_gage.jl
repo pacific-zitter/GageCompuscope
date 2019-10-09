@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 const CS_MODE_SINGLE = 0x01
 const CS_MODE_DUAL = 0x02
 const CS_MODE_QUAD = 0x04
@@ -228,7 +227,7 @@ const CS_OCT_MODE1 = 1
 const CS_OCT_CORE_CONFIG = 330
 const CS_OCT_RECORD_LEN = 331
 const CS_OCT_CMD_MODE = 332
-=======
+=== === =
 const CS_MODE_SINGLE = 0x01
 const CS_MODE_DUAL = 0x02
 const CS_MODE_QUAD = 0x04
@@ -458,4 +457,3 @@ const CS_OCT_MODE1 = 1
 const CS_OCT_CORE_CONFIG = 330
 const CS_OCT_RECORD_LEN = 331
 const CS_OCT_CMD_MODE = 332
->>>>>>> 29ef793a7e338feaebbe2e21b81b2d4c07aef89f
