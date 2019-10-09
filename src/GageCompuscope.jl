@@ -1,15 +1,11 @@
 module GageCompuscope
 using HDF5
 
-include(joinpath(@__DIR__, "..", "gen", "LibGage.jl"))
+include(joinpath(@__DIR__, "..", "LibGage", "LibGage.jl"))
 using .LibGage
 
-include("higher.jl")
+include("gagecard.jl")
 
-foreach(names(@__MODULE__, all = true, imported = false)) do s
-    if match(r"eval|include"i,string(s)) isa Nothing
-        @eval export $s
-    end
-end
+export GageCard, get_configs!, get_systeminfo!, free_system
 
 end

@@ -1,17 +1,12 @@
 include("defines_gage.jl")
 include("common_gage.jl")
-
-const gagehandle = Ref{UInt32}(0)
-
+const _csget = (CSACQUISITIONCONFIG=CS_ACQUISITION,
+                        CSTRIGGERCONFIG=CS_TRIGGER,
+                        CSCHANNELCONFIG=CS_CHANNEL,
+                        CSSYSTEMINFO=CS_BOARD_INFO)
 
 function CsInitialize()
     ccall((:CsInitialize, :CsSsm), Int32, ())
-end
-
-function initialize_gage()
-    global gagehandle
-    CsInitialize()
-    CsGetSystem(gagehandle, 0, 0, 0, 0)
 end
 
 function CsGetSystem(
@@ -37,15 +32,7 @@ function CsFreeSystem(handle)
     ccall((:CsFreeSystem, :CsSsm), Int32, (UInt32,), handle)
 end
 
-function free_system()
-    global gagehandle
-    CsFreeSystem(gagehandle[])
-end
-
-
-function CsGet(nIndex, nConfig, pData::T) where {T}
-    global gagehandle
-    hSystem = gagehandle[]
+function CsGet(hSystem, nIndex, nConfig, pData::T) where {T}
     ccall(
         (:CsGet, :CsSsm),
         Int32,
@@ -56,6 +43,23 @@ function CsGet(nIndex, nConfig, pData::T) where {T}
         pData,
     )
 end
+
+function CsGet(hSystem, pData::T) where {T}
+    G = typeof(pData) |> Symbol
+    @show G
+    idx = getfield(_csget, G)
+    ccall(
+        (:CsGet, :CsSsm),
+        Int32,
+        (UInt32, Int32, Int32, Ref{T}),
+        hSystem,
+        idx,
+        CS_CURRENT_CONFIGURATION,
+        pData,
+    )
+end
+
+
 
 function CsSet(nIndex, pData::T) where T
     global gagehandle
