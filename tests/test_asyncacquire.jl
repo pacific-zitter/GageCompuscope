@@ -29,4 +29,6 @@ inp.pDataBuffer = pointer(ddb)
 token = Ref{Int32}(0)
 q = Int32[]
 
-LibGage.CsTransferAS(GageCompuscope.gagehandle[], inp, outp, token) |> LibGage.CsGetErrorString
+LibGage.CsTransferAS(GageCompuscope.gagehandle[], inp, outp, token) |>
+LibGage.CsGetErrorString
+ 

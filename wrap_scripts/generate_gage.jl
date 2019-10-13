@@ -1,4 +1,4 @@
-function generate(wc::WrapContext;generate_template=false)
+function generate(wc::WrapContext; generate_template = false)
     # parse headers
     ctx = DefaultContext(wc.index)
     parse_headers!(
@@ -11,9 +11,8 @@ function generate(wc::WrapContext;generate_template=false)
     ctx.options["is_struct_mutable"] = wc.options.ismutable
     # Helper to store file handles
     filehandles = Dict{String,IOStream}()
-    getfile(f) =
-        (f in keys(filehandles)) ? filehandles[f] :
-        (filehandles[f] = open(f, "w"))
+    getfile(f) = (f in keys(filehandles)) ? filehandles[f] :
+    (filehandles[f] = open(f, "w"))
 
     for trans_unit in ctx.trans_units
         root_cursor = getcursor(trans_unit)
