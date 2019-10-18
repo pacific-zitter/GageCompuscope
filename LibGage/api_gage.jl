@@ -166,7 +166,7 @@ function CsTransferAS(hSystem, pInData, pOutParams, pToken)
         Int32,
         (
          UInt32,
-         Ref{IN_PARAMS_TRANSFERDATA},
+         Ptr{IN_PARAMS_TRANSFERDATA},
          Ref{OUT_PARAMS_TRANSFERDATA},
          Ptr{Int32},
         ),

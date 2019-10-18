@@ -42,11 +42,14 @@ function GageCard(board_index)
     gage.acquisition_config = CSACQUISITIONCONFIG()
 
     gage.channel_configs = CSCHANNELCONFIG[]
-    [push!(gage.channel_configs, CSCHANNELCONFIG(Int(i))) for i in gage.systeminfo.ChannelCount]
+    for i = 1:gage.systeminfo.ChannelCount
+        push!(gage.channel_configs, CSCHANNELCONFIG(Int(i)))
+    end
 
     gage.trigger_configs = CSTRIGGERCONFIG[]
-    [push!(gage.trigger_configs, CSTRIGGERCONFIG(Int(i))) for i in gage.systeminfo.TriggerMachineCount]
-
+    for i = 1:gage.systeminfo.TriggerMachineCount
+        push!(gage.trigger_configs, CSTRIGGERCONFIG(Int(i)))
+    end
     get_configs!(gage)
 
     return gage
@@ -60,6 +63,18 @@ function start(g::GageCard)
     CsDo(g.gagehandle, ACTION_START)
 end
 
+function abort(g::GageCard)
+    CsDo(g.gagehandle, ACTION_ABORT)
+end
+
+function force_trigger(g::GageCard)
+    CsDo(g.gagehandle, ACTION_FORCE)
+end
+
+function get_gagestatus(g::GageCard)
+    CsGetStatus(g.gagehandle)
+end
+
 function set_segmentsize(g::GageCard, nsegment)
     g.acquisition_config.Depth = nsegment
     g.acquisition_config.SegmentSize = nsegment
@@ -67,6 +82,11 @@ function set_segmentsize(g::GageCard, nsegment)
     CsDo(g.gagehandle, ACTION_COMMIT)
 end
 
+function set_samplerate(g::GageCard, samplerate)
+    g.acquisition_config.SampleRate = samplerate
+    CsSet(g.gagehandle, CS_ACQUISITION, g.acquisition_config)
+    CsDo(g.gagehandle, ACTION_COMMIT)
+end
 
 #------------------------------------------------------------------------------
 mutable struct Transfer

@@ -220,15 +220,16 @@ const PCSFILTERTABLE = Ptr{CSFILTERTABLE}
 
 mutable struct IN_PARAMS_TRANSFERDATA
     Channel::UInt16
-    Mode::UInt32
-    Segment::UInt32
+    Mode::Cuint
+    Segment::Cuint
     StartAddress::Clonglong
     Length::Clonglong
     pDataBuffer::Ptr{Cvoid}
-    hNotifyEvent::Ptr{Ptr{Cvoid}}
+    hNotifyEvent::Ptr{Cvoid}
 end
 IN_PARAMS_TRANSFERDATA() =
     IN_PARAMS_TRANSFERDATA(0, 0, 0, 0, 0, Ptr{Cvoid}(), C_NULL)
+
 const PIN_PARAMS_TRANSFERDATA = Ptr{IN_PARAMS_TRANSFERDATA}
 
 mutable struct OUT_PARAMS_TRANSFERDATA

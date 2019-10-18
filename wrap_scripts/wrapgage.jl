@@ -11,9 +11,9 @@ end
 
 wc = Clang.init(
     headers = hdrs,
-    output_file = joinpath(@__DIR__, "..", "gen", "api_gage.jl"),
-    common_file = joinpath(@__DIR__, "..", "gen", "common_gage.jl"),
-    clang_args = ["-xc++", "-v", "-I", gage_path],
+    output_file =  "xapi_gage.jl",
+    common_file =  "xcommon_gage.jl",
+    clang_args = ["-xc", "-v", "-I", gage_path],
     header_library = x -> ":CsSsm",
     clang_includes = vcat(gage_path, LLVM_INCLUDE, CLANG_INCLUDE),
     header_wrapped = shouldwrap,
