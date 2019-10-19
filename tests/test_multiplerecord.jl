@@ -6,7 +6,7 @@ gage = GageCard(0)
 set_samplerate(gage, 10^7)
 set_segmentsize(gage, 10000)
 set_segmentcount(gage,1000)
-gage.trigger_configs[1].Level = 5
+gage.trigger_config[1].Level = 5
 commit(gage)
 
 xfer = MultipleTransfer(gage)
