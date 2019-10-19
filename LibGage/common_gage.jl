@@ -222,13 +222,24 @@ mutable struct IN_PARAMS_TRANSFERDATA
     Channel::UInt16
     Mode::Cuint
     Segment::Cuint
-    StartAddress::Clonglong
-    Length::Clonglong
+    StartAddress::Int64
+    Length::Int64
     pDataBuffer::Ptr{Cvoid}
-    hNotifyEvent::Ptr{Cvoid}
+    hNotifyEvent::Ptr{Ptr{Cvoid}}
 end
 IN_PARAMS_TRANSFERDATA() =
     IN_PARAMS_TRANSFERDATA(0, 0, 0, 0, 0, Ptr{Cvoid}(), C_NULL)
+
+mutable struct AsyncTransfer
+    Channel::UInt16
+    Mode::Cuint
+    Segment::Cuint
+    StartAddress::Int64
+    Length::Int64
+    pDataBuffer::Ptr{Cvoid}
+end
+AsyncTransfer() =
+    AsyncTransfer(0, 0, 0, 0, 0, Ptr{Cvoid}())
 
 const PIN_PARAMS_TRANSFERDATA = Ptr{IN_PARAMS_TRANSFERDATA}
 

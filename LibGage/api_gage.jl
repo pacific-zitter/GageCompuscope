@@ -144,8 +144,9 @@ function CsGetEventHandle(hSystem, u32EventType, phEvent)
 end
 
 function CsGetStatus(hSystem)
-    @threadcall((:CsGetStatus, :CsSsm), Int32, (UInt32,), hSystem)
+    ccall((:CsGetStatus, :CsSsm), Int32, (UInt32,), hSystem)
 end
+
 
 function CsGetErrorString(i32ErrorCode)
     buffer = Vector{UInt8}(undef, 256)
@@ -168,7 +169,7 @@ function CsTransferAS(hSystem, pInData, pOutParams, pToken)
          UInt32,
          Ptr{IN_PARAMS_TRANSFERDATA},
          Ref{OUT_PARAMS_TRANSFERDATA},
-         Ptr{Int32},
+         Ref{Int32},
         ),
         hSystem,
         pInData,
@@ -181,7 +182,7 @@ function CsGetTransferASResult(hSystem, nChannelIndex, pi64Results)
     ccall(
         (:CsGetTransferASResult, :CsSsm),
         Int32,
-        (UInt32, Int32, Ptr{Int64}),
+        (UInt32, Int32, Ref{Int64}),
         hSystem,
         nChannelIndex,
         pi64Results,

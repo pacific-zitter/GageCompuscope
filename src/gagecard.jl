@@ -67,17 +67,27 @@ function abort(g::GageCard)
     CsDo(g.gagehandle, ACTION_ABORT)
 end
 
-function force_trigger(g::GageCard)
-    CsDo(g.gagehandle, ACTION_FORCE)
+function commit(g::GageCard)
+    CsDo(g.gagehandle,ACTION_COMMIT)
 end
 
-function get_gagestatus(g::GageCard)
+function get_status(g::GageCard)
     CsGetStatus(g.gagehandle)
+end
+
+function force_trigger(g::GageCard)
+    CsDo(g.gagehandle, ACTION_FORCE)
 end
 
 function set_segmentsize(g::GageCard, nsegment)
     g.acquisition_config.Depth = nsegment
     g.acquisition_config.SegmentSize = nsegment
+    CsSet(g.gagehandle, CS_ACQUISITION, g.acquisition_config)
+    CsDo(g.gagehandle, ACTION_COMMIT)
+end
+
+function set_segmentcount(g::GageCard, n)
+    g.acquisition_config.SegmentCount = n
     CsSet(g.gagehandle, CS_ACQUISITION, g.acquisition_config)
     CsDo(g.gagehandle, ACTION_COMMIT)
 end
@@ -113,10 +123,52 @@ end
 
 Base.convert(::Type{IN_PARAMS_TRANSFERDATA}, x::Transfer) = x.input
 
+function Base.unsafe_convert(::Type{Ptr{OUT_PARAMS_TRANSFERDATA}},x::OUT_PARAMS_TRANSFERDATA)
+    Base.unsafe_convert(Ptr{OUT_PARAMS_TRANSFERDATA},Ref(x))
+end
 function acquire(gage::GageCard, xfer::Transfer)
     start(gage)
     while CsGetStatus(gage.gagehandle) > 0
     end
     CsTransfer(gage.gagehandle, xfer.input, xfer.output)
     nothing
+end
+
+function transfer_data(g::GageCard, xfer::Transfer)
+    CsTransfer_threadcall(g.gagehandle, xfer.input, xfer.output)
+end
+
+function until_ready(g::GageCard;timeout=10.0)
+    status = get_status(g)
+    t1 = time()
+    laststatus = 0
+    while status > 0
+        sleep(1e-2)
+        time() - t1 > timeout && break
+        status = get_status(g)
+    end
+end
+struct MultipleTransfer
+    input::IN_PARAMS_TRANSFERDATA
+    output::OUT_PARAMS_TRANSFERDATA
+    segment_buffer::Array{Int16,2}
+end
+
+function MultipleTransfer(g::GageCard)
+    acq = g.acquisition_config
+    _inp = IN_PARAMS_TRANSFERDATA(1,0,1,acq.SampleOffset,acq.SegmentSize,C_NULL,C_NULL)
+    _outp = OUT_PARAMS_TRANSFERDATA(0,0,0,0)
+
+    xfer = MultipleTransfer(_inp, _outp, Array{Int16,2}(undef,acq.SegmentSize,acq.SegmentCount))
+    xfer.input.pDataBuffer = pointer(xfer.segment_buffer)
+    return xfer
+end
+
+function transfer_multiplerecord(g::GageCard,x::MultipleTransfer)
+    @inbounds for (i,xt) in enumerate(eachcol(x.segment_buffer))
+        x.input.Segment = i
+        x.input.pDataBuffer = pointer(xt)
+        st = CsTransfer(g.gagehandle, x.input,x.output)
+        st < 0 && error("failed.")
+    end
 end
