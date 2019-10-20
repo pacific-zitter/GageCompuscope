@@ -143,5 +143,14 @@ const trigger_sources = Dict(
     "external" => CS_TRIG_SOURCE_EXT,
     "off" => CS_TRIG_SOURCE_DISABLE,
 )
+function set_trigger!(g::GageCard,idx,level,source="1";condition="rising")
+    level > 100 && error("level is given as a percent of source. 0-100%")
+    trgr = g.trigger_config[idx]
+    trgr.Level = level
+    trgr.Source = trigger_sources[source]
+    trgr.Condition = trigger_conditions[condition]
+    CsSet(g.gagehandle,CS_TRIGGER,trgr)
+    commit(g)
+end
 
 cserror(code) = CsGetErrorString(code)
