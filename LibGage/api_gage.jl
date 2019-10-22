@@ -35,6 +35,18 @@ function CsFreeSystem(handle)
     ccall((:CsFreeSystem, :CsSsm), Int32, (UInt32,), handle)
 end
 
+function CsGet(hSystem, nIndex, nConfig, pData::Ptr{T}) where {T}
+    ccall(
+        (:CsGet, :CsSsm),
+        Int32,
+        (UInt32, Int32, Int32, Ptr{T}),
+        hSystem,
+        nIndex,
+        nConfig,
+        pData,
+    )
+end
+
 function CsGet(hSystem, nIndex, nConfig, pData::T) where {T}
     ccall(
         (:CsGet, :CsSsm),
@@ -201,11 +213,11 @@ function CsRegisterCallbackFnc(hSystem, u32Event, pCallBack)
     )
 end
 
-function CsExpertCall(hSystem, pFunctionParams)
+function CsExpertCall(hSystem, pFunctionParams::T) where T
     ccall(
         (:CsExpertCall, :CsSsm),
         Int32,
-        (UInt32, Ptr{Cvoid}),
+        (UInt32, Ptr{T}),
         hSystem,
         pFunctionParams,
     )
