@@ -17,20 +17,20 @@ const EXFN_DISK_STREAM_TIMING_STATS = 19 | EXFX_DISK_STREAM_MASK# DiskStream: Re
 
 
 Base.@kwdef mutable struct DiskStream
-    size::Cuint# size of this structure
-    actionId::Cuint# Must be one of the EXFN_DISK_STREAM_XXXX commands
-    timeout::Cuint# Time (in milliseconds) to wait before forcing a trigger
-    xferStart::Int64# Address at which to start transferring the data
-    xferLen::Int64# Length of data (in samples) to transfer
-    recStart::Cuint# Which segment to start transfer from (single record transfers should be set to 1)
-    recCount::Cuint# How many segments to transfer (single record transfers should be set to 1)
-    acqNum::Cuint# How many acquisitions to perform
-    filesPerChannel::Cuint                 # Returns how many files will be created for each channel
-    timeStamp::Cint# Flag to determine if the trigger time stamp should be set in the header comment field
-    statusTimeout::Cuint# Time (in milliseconds) in which to check whether or not all acquisitions and writes are finished
-    channelCount::Cuint# Number of channels to transfer
-    chanList::NTuple{16,Cushort}# List of which channels to transfer, the first ChannelCount values in the array are used
-    path::NTuple{256,Cchar} # Name of base folder to store files. Relative paths are stored below the current directory
+    size::Cuint                     # size of this structure
+    actionId::Cuint                 # Must be one of the EXFN_DISK_STREAM_XXXX commands
+    timeout::Cuint                  # Time (in milliseconds) to wait before forcing a trigger
+    xferStart::Int64                # Address at which to start transferring the data
+    xferLen::Int64                  # Length of data (in samples) to transfer
+    recStart::Cuint                 # Which segment to start transfer from (single record transfers should be set to 1)
+    recCount::Cuint                 # How many segments to transfer (single record transfers should be set to 1)
+    acqNum::Cuint                   # How many acquisitions to perform
+    filesPerChannel::Cuint          # Returns how many files will be created for each channel
+    timeStamp::Cint                 # Flag to determine if the trigger time stamp should be set in the header comment field
+    statusTimeout::Cuint            # Time (in milliseconds) in which to check whether or not all acquisitions and writes are finished
+    channelCount::Cuint             # Number of channels to transfer
+    chanList::NTuple{16,Cushort}    # List of which channels to transfer, the first ChannelCount values in the array are used
+    path::NTuple{256,Cchar}         # Name of base folder to store files. Relative paths are stored below the current directory
 end
 
 
@@ -45,6 +45,7 @@ function initialize_stream(g::GageCard; path = nothing)
     else
         savdir = mktempdir(; prefix = "gingergage_", cleanup = true)
     end
+
     dcfg = DiskStream(
         ;
         size = sizeof(DiskStream),
