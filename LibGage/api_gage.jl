@@ -99,7 +99,7 @@ function CsGetSystemCaps(hSystem, CapsId, pBuffer, BufferSize)
     ccall(
         (:CsGetSystemCaps, :CsSsm),
         Int32,
-        (UInt32, UInt32, Ptr{Cvoid}, Ptr{UInt32}),
+        (UInt32, UInt32, Ptr{Cvoid}, Ref{Cuint}),
         hSystem,
         CapsId,
         pBuffer,
@@ -137,7 +137,7 @@ function CsTransferEx(hSystem, pInData, outData)
     ccall(
         (:CsTransferEx, :CsSsm),
         Int32,
-        (UInt32, PIN_PARAMS_TRANSFERDATA_EX, POUT_PARAMS_TRANSFERDATA_EX),
+        (UInt32,Ptr{IN_PARAMS_TRANSFERDATA_EX}, Ptr{OUT_PARAMS_TRANSFERDATA_EX}),
         hSystem,
         pInData,
         outData,
@@ -148,12 +148,24 @@ function CsGetEventHandle(hSystem, u32EventType, phEvent)
     ccall(
         (:CsGetEventHandle, :CsSsm),
         Int32,
-        (UInt32, UInt32, Ptr{Ptr{Cvoid}}),
+        (UInt32, UInt32, Ref{Threads.Event}),
         hSystem,
         u32EventType,
         phEvent,
     )
 end
+function event_handle(handle,eventtype,eventhandle)
+    Base.@threadcall(
+        (:CsGetEventHandle, :CsSsm),
+        Int32,
+        (UInt32, UInt32, Ptr{Threads.Event}),
+        handle,
+        eventtype,
+        eventhandle,
+    )
+end
+
+
 
 function CsGetStatus(hSystem)
     ccall((:CsGetStatus, :CsSsm), Int32, (UInt32,), hSystem)
@@ -217,7 +229,7 @@ function CsExpertCall(hSystem, pFunctionParams::T) where T
     ccall(
         (:CsExpertCall, :CsSsm),
         Int32,
-        (UInt32, Ptr{T}),
+        (UInt32, Ref{T}),
         hSystem,
         pFunctionParams,
     )

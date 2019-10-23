@@ -85,10 +85,10 @@ end
 option ∈ [:all, :acquisition,:channel,:trigger]
 """
 function set_cfg!(gage, cfg, option)
-    cfg = Symbol(option,:_config)
+    cfg = Symbol(option, :_config)
     nidx = eval(Symbol("CS_", uppercase(string(option))))
     @show Base.@locals
-    CsSet(gage.gagehandle, nidx,cfg)
+    CsSet(gage.gagehandle, nidx, cfg)
 end
 
 
@@ -128,7 +128,7 @@ function set_channel!(
     cfg.InputRange = range_mv
     cfg.Term = terminations[termination]
     cfg.Impedance = impedances[impedance]
-    CsSet(g.gagehandle,CS_CHANNEL,cfg)
+    CsSet(g.gagehandle, CS_CHANNEL, cfg)
     commit(g)
 end
 
@@ -143,13 +143,19 @@ const trigger_sources = Dict(
     "external" => CS_TRIG_SOURCE_EXT,
     "off" => CS_TRIG_SOURCE_DISABLE,
 )
-function set_trigger!(g::GageCard,idx,level,source="1";condition="rising")
+function set_trigger!(
+    g::GageCard,
+    idx,
+    level,
+    source = "1";
+    condition = "rising",
+)
     level > 100 && error("level is given as a percent of source. 0-100%")
     trgr = g.trigger_config[idx]
     trgr.Level = level
     trgr.Source = trigger_sources[source]
     trgr.Condition = trigger_conditions[condition]
-    CsSet(g.gagehandle,CS_TRIGGER,trgr)
+    CsSet(g.gagehandle, CS_TRIGGER, trgr)
     commit(g)
 end
 

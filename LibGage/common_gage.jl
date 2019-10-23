@@ -229,7 +229,7 @@ mutable struct IN_PARAMS_TRANSFERDATA
 end
 IN_PARAMS_TRANSFERDATA() =
     IN_PARAMS_TRANSFERDATA(0, 0, 0, 0, 0, Ptr{Cvoid}(), C_NULL)
-IN_PARAMS_TRANSFERDATA(a::Array) = IN_PARAMS_TRANSFERDATA(a[1:end-1]...,C_NULL)
+IN_PARAMS_TRANSFERDATA(a::Array) = IN_PARAMS_TRANSFERDATA(a[1:end-1]..., C_NULL)
 mutable struct AsyncTransfer
     Channel::Cushort
     Mode::Cuint
@@ -238,9 +238,8 @@ mutable struct AsyncTransfer
     Length::Int64
     pDataBuffer::Ptr{Cvoid}
 end
-AsyncTransfer() =
-    AsyncTransfer(0, 0, 0, 0, 0, Ptr{Cvoid}())
-AsyncTransfer(a::Array) = AsyncTransfer(a[1:end-1]...,C_NULL)
+AsyncTransfer() = AsyncTransfer(0, 0, 0, 0, 0, Ptr{Cvoid}())
+AsyncTransfer(a::Array) = AsyncTransfer(a[1:end-1]..., C_NULL)
 const PIN_PARAMS_TRANSFERDATA = Ptr{IN_PARAMS_TRANSFERDATA}
 
 mutable struct OUT_PARAMS_TRANSFERDATA
@@ -262,17 +261,13 @@ mutable struct IN_PARAMS_TRANSFERDATA_EX
     Length::Clonglong
     pDataBuffer::Ptr{Cvoid}
     BufferLength::Clonglong
-    hNotifyEvent::Ptr{Ptr{Cvoid}}
 end
-
-const PIN_PARAMS_TRANSFERDATA_EX = Ptr{IN_PARAMS_TRANSFERDATA_EX}
 
 mutable struct OUT_PARAMS_TRANSFERDATA_EX
     DataFormat0::UInt32
     DataFormat1::UInt32
 end
 
-const POUT_PARAMS_TRANSFERDATA_EX = Ptr{OUT_PARAMS_TRANSFERDATA_EX}
 
 mutable struct CALLBACK_DATA
     Size::UInt32

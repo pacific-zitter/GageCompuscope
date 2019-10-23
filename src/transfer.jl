@@ -1,3 +1,8 @@
+"""
+    Transfer
+object that wraps over the gage api structures for easier and less error prone
+use as a buffer.
+"""
 mutable struct Transfer
     input::IN_PARAMS_TRANSFERDATA
     output::OUT_PARAMS_TRANSFERDATA
@@ -26,6 +31,11 @@ function Base.unsafe_convert(::Type{Ptr{OUT_PARAMS_TRANSFERDATA}},x::OUT_PARAMS_
     Base.unsafe_convert(Ptr{OUT_PARAMS_TRANSFERDATA},Ref(x))
 end
 
+"""
+    acquire
+Arm the GageCard trigger, wait for an acquisition to complete, and transfer that
+acquisition to the Transfer structure.
+"""
 function acquire(gage::GageCard, xfer::Transfer)
     start(gage)
     while CsGetStatus(gage.gagehandle) > 0
@@ -34,10 +44,18 @@ function acquire(gage::GageCard, xfer::Transfer)
     nothing
 end
 
+"""
+    transfer_data
+Transfer onboard memory. Simple method.
+"""
 function transfer_data(g::GageCard, xfer::Transfer)
     CsTransfer_threadcall(g.gagehandle, xfer.input, xfer.output)
 end
 
+"""
+    until_ready
+Queries the driver until the status returns ready.
+"""
 function until_ready(g::GageCard;timeout=10.0)
     status = get_status(g)
     t1 = time()
@@ -48,6 +66,10 @@ function until_ready(g::GageCard;timeout=10.0)
         status = get_status(g)
     end
 end
+
+#=
+    @TODO: Roll this multiple record and single record into the same interface.
+=#
 struct MultipleTransfer
     input::IN_PARAMS_TRANSFERDATA
     output::OUT_PARAMS_TRANSFERDATA
@@ -58,11 +80,11 @@ function MultipleTransfer(g::GageCard)
     acq = g.acquisition_config
     _inp = IN_PARAMS_TRANSFERDATA(1,0,1,acq.SampleOffset,acq.SegmentSize,C_NULL,C_NULL)
     _outp = OUT_PARAMS_TRANSFERDATA(0,0,0,0)
-
     xfer = MultipleTransfer(_inp, _outp, Array{Int16,2}(undef,acq.SegmentSize,acq.SegmentCount))
     xfer.input.pDataBuffer = pointer(xfer.segment_buffer)
     return xfer
 end
+
 
 function transfer_multiplerecord(g::GageCard,x::MultipleTransfer)
     @inbounds for (i,xt) in enumerate(eachcol(x.segment_buffer))
