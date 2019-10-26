@@ -1,26 +1,22 @@
 
 include("defines_gage.jl")
 include("common_gage.jl")
-const _csget = (
-    CSACQUISITIONCONFIG = CS_ACQUISITION,
+const _csget = (CSACQUISITIONCONFIG = CS_ACQUISITION,
     CSTRIGGERCONFIG = CS_TRIGGER,
     CSCHANNELCONFIG = CS_CHANNEL,
-    CSSYSTEMINFO = CS_BOARD_INFO,
-)
+    CSSYSTEMINFO = CS_BOARD_INFO,)
 
 function CsInitialize()
     ccall((:CsInitialize, :CsSsm), Int32, ())
 end
 
-function CsGetSystem(
-    phSystem,
+function CsGetSystem(phSystem,
     u32BoardType,
     u32Channels,
     u32SampleBits,
     i16Index,
 )
-    ccall(
-        (:CsGetSystem, :CsSsm),
+    ccall((:CsGetSystem, :CsSsm),
         Int32,
         (Ptr{UInt32}, UInt32, UInt32, UInt32, Int16),
         phSystem,
@@ -36,8 +32,7 @@ function CsFreeSystem(handle)
 end
 
 function CsGet(hSystem, nIndex, nConfig, pData::Ptr{T}) where {T}
-    ccall(
-        (:CsGet, :CsSsm),
+    ccall((:CsGet, :CsSsm),
         Int32,
         (UInt32, Int32, Int32, Ptr{T}),
         hSystem,
@@ -48,8 +43,7 @@ function CsGet(hSystem, nIndex, nConfig, pData::Ptr{T}) where {T}
 end
 
 function CsGet(hSystem, nIndex, nConfig, pData::T) where {T}
-    ccall(
-        (:CsGet, :CsSsm),
+    ccall((:CsGet, :CsSsm),
         Int32,
         (UInt32, Int32, Int32, Ref{T}),
         hSystem,
@@ -60,10 +54,9 @@ function CsGet(hSystem, nIndex, nConfig, pData::T) where {T}
 end
 
 function CsGet(hSystem, pData::T) where {T}
-    G = typeof(pData) |> (x,) -> split(string(x), '.')[end] |> Symbol
+    G = typeof(pData) |> (x,)->split(string(x), '.')[end] |> Symbol
     idx = getfield(_csget, G)
-    ccall(
-        (:CsGet, :CsSsm),
+    ccall((:CsGet, :CsSsm),
         Int32,
         (UInt32, Int32, Int32, Ref{T}),
         hSystem,
@@ -74,8 +67,7 @@ function CsGet(hSystem, pData::T) where {T}
 end
 
 function CsSet(hSystem, nIndex, pData::T) where {T}
-    ccall(
-        (:CsSet, :CsSsm),
+    ccall((:CsSet, :CsSsm),
         Int32,
         (UInt32, Int32, Ref{T}),
         hSystem,
@@ -85,8 +77,7 @@ function CsSet(hSystem, nIndex, pData::T) where {T}
 end
 
 function CsGetSystemInfo(hSystem, pSystemInfo)
-    ccall(
-        (:CsGetSystemInfo, :CsSsm),
+    ccall((:CsGetSystemInfo, :CsSsm),
         Int32,
         (UInt32, Ref{CSSYSTEMINFO}),
         hSystem,
@@ -96,8 +87,7 @@ end
 CsGetSystemInfo(info) = CsGetSystemInfo(gagehandle[], info)
 
 function CsGetSystemCaps(hSystem, CapsId, pBuffer, BufferSize)
-    ccall(
-        (:CsGetSystemCaps, :CsSsm),
+    ccall((:CsGetSystemCaps, :CsSsm),
         Int32,
         (UInt32, UInt32, Ptr{Cvoid}, Ref{Cuint}),
         hSystem,
@@ -112,8 +102,7 @@ function CsDo(hSystem, i16Operation)
 end
 
 function CsTransfer(hSystem, pInData, outData)
-    ccall(
-        (:CsTransfer, :CsSsm),
+    ccall((:CsTransfer, :CsSsm),
         Int32,
         (UInt32, Ref{IN_PARAMS_TRANSFERDATA}, Ref{OUT_PARAMS_TRANSFERDATA}),
         hSystem,
@@ -134,10 +123,9 @@ function CsTransfer_threadcall(hSystem, pInData, outData)
 end
 
 function CsTransferEx(hSystem, pInData, outData)
-    ccall(
-        (:CsTransferEx, :CsSsm),
+    ccall((:CsTransferEx, :CsSsm),
         Int32,
-        (UInt32,Ptr{IN_PARAMS_TRANSFERDATA_EX}, Ptr{OUT_PARAMS_TRANSFERDATA_EX}),
+        (UInt32, Ptr{IN_PARAMS_TRANSFERDATA_EX}, Ptr{OUT_PARAMS_TRANSFERDATA_EX}),
         hSystem,
         pInData,
         outData,
@@ -145,8 +133,7 @@ function CsTransferEx(hSystem, pInData, outData)
 end
 
 function CsGetEventHandle(hSystem, u32EventType, phEvent)
-    ccall(
-        (:CsGetEventHandle, :CsSsm),
+    ccall((:CsGetEventHandle, :CsSsm),
         Int32,
         (UInt32, UInt32, Ref{Threads.Event}),
         hSystem,
@@ -154,7 +141,7 @@ function CsGetEventHandle(hSystem, u32EventType, phEvent)
         phEvent,
     )
 end
-function event_handle(handle,eventtype,eventhandle)
+function event_handle(handle, eventtype, eventhandle)
     Base.@threadcall(
         (:CsGetEventHandle, :CsSsm),
         Int32,
@@ -174,8 +161,7 @@ end
 
 function CsGetErrorString(i32ErrorCode)
     buffer = Vector{UInt8}(undef, 256)
-    ccall(
-        (:CsGetErrorStringA, :CsSsm),
+    ccall((:CsGetErrorStringA, :CsSsm),
         Int32,
         (Int32, Cstring, Cint),
         i32ErrorCode,
@@ -187,15 +173,12 @@ end
 
 function CsTransferAS(hSystem, pInData, pOutParams, pToken)
     pin = Ref(pInData)
-    ccall(
-        (:CsTransferAS, :CsSsm),
+    ccall((:CsTransferAS, :CsSsm),
         Int32,
-        (
-         UInt32,
+        (UInt32,
          Ptr{Cvoid},
          Ptr{OUT_PARAMS_TRANSFERDATA},
-         Ptr{Int32},
-        ),
+         Ptr{Int32},),
         hSystem,
         pin,
         pOutParams,
@@ -204,8 +187,7 @@ function CsTransferAS(hSystem, pInData, pOutParams, pToken)
 end
 
 function CsGetTransferASResult(hSystem, nChannelIndex, pi64Results)
-    ccall(
-        (:CsGetTransferASResult, :CsSsm),
+    ccall((:CsGetTransferASResult, :CsSsm),
         Int32,
         (UInt32, Cint, Ptr{Int64}),
         hSystem,
@@ -215,8 +197,7 @@ function CsGetTransferASResult(hSystem, nChannelIndex, pi64Results)
 end
 
 function CsRegisterCallbackFnc(hSystem, u32Event, pCallBack)
-    ccall(
-        (:CsRegisterCallbackFnc, :CsSsm),
+    ccall((:CsRegisterCallbackFnc, :CsSsm),
         Int32,
         (UInt32, UInt32, LPCsEventCallback),
         hSystem,
@@ -226,8 +207,7 @@ function CsRegisterCallbackFnc(hSystem, u32Event, pCallBack)
 end
 
 function CsExpertCall(hSystem, pFunctionParams::T) where T
-    ccall(
-        (:CsExpertCall, :CsSsm),
+    ccall((:CsExpertCall, :CsSsm),
         Int32,
         (UInt32, Ref{T}),
         hSystem,

@@ -79,7 +79,7 @@ mutable struct CSSYSTEMINFO
 end
 
 CSSYSTEMINFO() = begin
-    o = CSSYSTEMINFO(zeros(7)..., ntuple(x -> 0, 32), zeros(5)...)
+    o = CSSYSTEMINFO(zeros(7)..., ntuple(x->0, 32), zeros(5)...)
     o.Size = sizeof(CSSYSTEMINFO)
     return o
 end
@@ -229,7 +229,7 @@ mutable struct IN_PARAMS_TRANSFERDATA
 end
 IN_PARAMS_TRANSFERDATA() =
     IN_PARAMS_TRANSFERDATA(0, 0, 0, 0, 0, Ptr{Cvoid}(), C_NULL)
-IN_PARAMS_TRANSFERDATA(a::Array) = IN_PARAMS_TRANSFERDATA(a[1:end-1]..., C_NULL)
+IN_PARAMS_TRANSFERDATA(a::Array) = IN_PARAMS_TRANSFERDATA(a[1:end - 1]..., C_NULL)
 mutable struct AsyncTransfer
     Channel::Cushort
     Mode::Cuint
@@ -239,7 +239,7 @@ mutable struct AsyncTransfer
     pDataBuffer::Ptr{Cvoid}
 end
 AsyncTransfer() = AsyncTransfer(0, 0, 0, 0, 0, Ptr{Cvoid}())
-AsyncTransfer(a::Array) = AsyncTransfer(a[1:end-1]..., C_NULL)
+AsyncTransfer(a::Array) = AsyncTransfer(a[1:end - 1]..., C_NULL)
 const PIN_PARAMS_TRANSFERDATA = Ptr{IN_PARAMS_TRANSFERDATA}
 
 mutable struct OUT_PARAMS_TRANSFERDATA

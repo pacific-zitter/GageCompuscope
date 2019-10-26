@@ -7,8 +7,7 @@ mutable struct GageCard
     GageCard() = new()
 end
 # --
-function LibGage.CsGet(
-    g::GageCard,
+function LibGage.CsGet(g::GageCard,
     cfg::Union{CSACQUISITIONCONFIG,CSTRIGGERCONFIG,CSCHANNELCONFIG},
 )
     LibGage.CsGet(g.gagehandle, cfg)
@@ -112,18 +111,15 @@ function set_samplerate(g::GageCard, samplerate)
 end
 
 const terminations = Dict("dc" => CS_COUPLING_DC, "ac" => CS_COUPLING_AC)
-const impedances = Dict(
-    "low" => CS_REAL_IMP_50_OHM,
+const impedances = Dict("low" => CS_REAL_IMP_50_OHM,
     "high" => CS_REAL_IMP_1M_OHM,
 )
 
-function set_channel!(
-    g::GageCard,
+function set_channel!(g::GageCard,
     index,
     range_mv::Int;
     impedance = "low",
-    termination = "ac",
-)
+    termination = "ac",)
     cfg::CSCHANNELCONFIG = g.channel_config[index]
     cfg.InputRange = range_mv
     cfg.Term = terminations[termination]
@@ -132,24 +128,20 @@ function set_channel!(
     commit(g)
 end
 
-const trigger_conditions = Dict(
-    "rising" => CS_TRIG_COND_POS_SLOPE,
+const trigger_conditions = Dict("rising" => CS_TRIG_COND_POS_SLOPE,
     "falling" => CS_TRIG_COND_NEG_SLOPE,
     "pulse_width" => CS_TRIG_COND_PULSE_WIDTH,
 )
-const trigger_sources = Dict(
-    "1" => CS_TRIG_SOURCE_CHAN_1,
+const trigger_sources = Dict("1" => CS_TRIG_SOURCE_CHAN_1,
     "2" => CS_TRIG_SOURCE_CHAN_2,
     "external" => CS_TRIG_SOURCE_EXT,
     "off" => CS_TRIG_SOURCE_DISABLE,
 )
-function set_trigger!(
-    g::GageCard,
+function set_trigger!(g::GageCard,
     idx,
     level,
     source = "1";
-    condition = "rising",
-)
+    condition = "rising",)
     level > 100 && error("level is given as a percent of source. 0-100%")
     trgr = g.trigger_config[idx]
     trgr.Level = level

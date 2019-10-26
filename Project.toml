@@ -2,6 +2,3 @@ name = "GageCompuscope"
 uuid = "3dd997b0-5015-46e7-9cdb-9b450c25aa40"
 
 [deps]
-CEnum = "fa961155-64e5-5f13-b03f-caf6b980ea82"
-ElasticArrays = "fdbdab4c-e67f-52f5-8c3f-e7b388dad3d4"
-HDF5 = "f67ccb44-e63f-5c2f-98bd-6dc0ccc4ba2f"

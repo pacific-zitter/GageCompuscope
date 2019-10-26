@@ -27,8 +27,8 @@ end
 
 Base.convert(::Type{IN_PARAMS_TRANSFERDATA}, x::Transfer) = x.input
 
-function Base.unsafe_convert(::Type{Ptr{OUT_PARAMS_TRANSFERDATA}},x::OUT_PARAMS_TRANSFERDATA)
-    Base.unsafe_convert(Ptr{OUT_PARAMS_TRANSFERDATA},Ref(x))
+function Base.unsafe_convert(::Type{Ptr{OUT_PARAMS_TRANSFERDATA}}, x::OUT_PARAMS_TRANSFERDATA)
+    Base.unsafe_convert(Ptr{OUT_PARAMS_TRANSFERDATA}, Ref(x))
 end
 
 """
@@ -56,7 +56,7 @@ end
     until_ready
 Queries the driver until the status returns ready.
 """
-function until_ready(g::GageCard;timeout=10.0)
+function until_ready(g::GageCard;timeout = 10.0)
     status = get_status(g)
     t1 = time()
     laststatus = 0
@@ -78,19 +78,19 @@ end
 
 function MultipleTransfer(g::GageCard)
     acq = g.acquisition_config
-    _inp = IN_PARAMS_TRANSFERDATA(1,0,1,acq.SampleOffset,acq.SegmentSize,C_NULL,C_NULL)
-    _outp = OUT_PARAMS_TRANSFERDATA(0,0,0,0)
-    xfer = MultipleTransfer(_inp, _outp, Array{Int16,2}(undef,acq.SegmentSize,acq.SegmentCount))
+    _inp = IN_PARAMS_TRANSFERDATA(1, 0, 1, acq.SampleOffset, acq.SegmentSize, C_NULL, C_NULL)
+    _outp = OUT_PARAMS_TRANSFERDATA(0, 0, 0, 0)
+    xfer = MultipleTransfer(_inp, _outp, Array{Int16,2}(undef, acq.SegmentSize, acq.SegmentCount))
     xfer.input.pDataBuffer = pointer(xfer.segment_buffer)
     return xfer
 end
 
 
-function transfer_multiplerecord(g::GageCard,x::MultipleTransfer)
-    @inbounds for (i,xt) in enumerate(eachcol(x.segment_buffer))
+function transfer_multiplerecord(g::GageCard, x::MultipleTransfer)
+    @inbounds for (i, xt) in enumerate(eachcol(x.segment_buffer))
         x.input.Segment = i
         x.input.pDataBuffer = pointer(xt)
-        st = CsTransfer(g.gagehandle, x.input,x.output)
+        st = CsTransfer(g.gagehandle, x.input, x.output)
         st < 0 && error("failed.")
     end
 end
