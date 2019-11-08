@@ -1,38 +1,3 @@
-# Automatically generated using Clang.jl
-@cenum _CSFILETYPES::UInt32 begin
-    cftNone = 0
-    cftBinaryData = 1
-    cftSigFile = 2
-    cftAscii = 3
-end
-
-const CsFileType = _CSFILETYPES
-
-@cenum _CSFILEMODES::UInt32 begin
-    cfmRead = 1
-    cfmWrite = 2
-    cfmReadWrite = 3
-end
-
-const CsFileMode = _CSFILEMODES
-
-@cenum _CSFILEATTACH::UInt32 begin
-    fmNew = 0
-end
-
-const CsFileAttach = _CSFILEATTACH
-
-@cenum CsCaptureMode::UInt32 begin
-    MemoryMode = 0
-    StreamingMode = 1
-end
-
-@cenum CsDataPackMode::UInt32 begin
-    DataUnpack = 0
-    DataPacked_8 = 1
-    DataPacked_12 = 2
-end
-
 const EVENT_Ptr{Cvoid} = Ptr{Cvoid}
 const SEM_Ptr{Cvoid} = Ptr{Cvoid}
 const MUTEX_Ptr{Cvoid} = Ptr{Cvoid}
@@ -230,16 +195,27 @@ end
 IN_PARAMS_TRANSFERDATA() =
     IN_PARAMS_TRANSFERDATA(0, 0, 0, 0, 0, Ptr{Cvoid}(), C_NULL)
 IN_PARAMS_TRANSFERDATA(a::Array) = IN_PARAMS_TRANSFERDATA(a[1:end - 1]..., C_NULL)
-mutable struct AsyncTransfer
+
+struct IN_PARAMS_TRANSFERDATA2
     Channel::Cushort
+    Mode::Cuint
+    Segment::Cuint
+    StartAddress::Cintmax_t
+    Length::Cintmax_t
+    pDataBuffer::Ptr{Cvoid}
+    hNotifyEvent::Ptr{Cvoid}
+end
+
+@cstruct AsyncTransfer {
+    channel::Cushort
     Mode::Cuint
     Segment::Cuint
     StartAddress::Int64
     Length::Int64
     pDataBuffer::Ptr{Cvoid}
-end
-AsyncTransfer() = AsyncTransfer(0, 0, 0, 0, 0, Ptr{Cvoid}())
-AsyncTransfer(a::Array) = AsyncTransfer(a[1:end - 1]..., C_NULL)
+}
+
+# AsyncTransfer(a::Array) = AsyncTransfer(a[1:end - 1]..., C_NULL)
 const PIN_PARAMS_TRANSFERDATA = Ptr{IN_PARAMS_TRANSFERDATA}
 
 mutable struct OUT_PARAMS_TRANSFERDATA
@@ -251,6 +227,9 @@ end
 OUT_PARAMS_TRANSFERDATA() = OUT_PARAMS_TRANSFERDATA(0, 0, 0, 0)
 
 const POUT_PARAMS_TRANSFERDATA = Ptr{OUT_PARAMS_TRANSFERDATA}
+
+
+
 
 mutable struct IN_PARAMS_TRANSFERDATA_EX
     Channel::UInt16

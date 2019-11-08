@@ -1,5 +1,5 @@
 module LibGage
-using CEnum
+using CBinding
 
 include(joinpath(@__DIR__, "api_gage.jl"))
 

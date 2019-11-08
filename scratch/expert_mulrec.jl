@@ -23,7 +23,13 @@ end
 
 const EXFN_RAWMULREC_TRANSFER = 9
 r = Vector{Cushort}(undef, 8192)
-hSystem, SegmentStart, SegmentCount, pRawDataBuffer, RawDataBufferSize = (gage.gagehandle, 1, 10, pointer(r), sizeof(r))
+hSystem, SegmentStart, SegmentCount, pRawDataBuffer, RawDataBufferSize = (
+    gage.gagehandle,
+    1,
+    10,
+    pointer(r),
+    sizeof(r),
+)
 # function SaveMulRecRawData(
 #     hSystem,
 #     SegmentStart,
@@ -33,7 +39,9 @@ hSystem, SegmentStart, SegmentCount, pRawDataBuffer, RawDataBufferSize = (gage.g
 # )
 sizeof(exIn) |> UInt
 
-expert_params = TransferMulRec(exIn(Size = sizeof(TransferMulRec),
+expert_params = TransferMulRec(
+    exIn(
+        Size = sizeof(TransferMulRec),
         ActionId = EXFN_RAWMULREC_TRANSFER,
         StartSegment = SegmentStart,
         EndSegment = SegmentStart + SegmentCount - 1,
@@ -42,7 +50,8 @@ expert_params = TransferMulRec(exIn(Size = sizeof(TransferMulRec),
     ),
     exOut(0),
 )
-ccall((:CsExpertCall, :CsSsm),
+ccall(
+    (:CsExpertCall, :CsSsm),
     Int32,
     (UInt32, Ptr{TransferMulRec}),
     hSystem,

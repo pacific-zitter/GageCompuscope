@@ -172,15 +172,14 @@ function CsGetErrorString(i32ErrorCode)
 end
 
 function CsTransferAS(hSystem, pInData, pOutParams, pToken)
-    pin = Ref(pInData)
     ccall((:CsTransferAS, :CsSsm),
         Int32,
         (UInt32,
-         Ptr{Cvoid},
-         Ptr{OUT_PARAMS_TRANSFERDATA},
+         Ref{IN_PARAMS_TRANSFERDATA},
+         Ref{OUT_PARAMS_TRANSFERDATA},
          Ptr{Int32},),
         hSystem,
-        pin,
+        pInData,
         pOutParams,
         pToken,
     )
@@ -189,7 +188,7 @@ end
 function CsGetTransferASResult(hSystem, nChannelIndex, pi64Results)
     ccall((:CsGetTransferASResult, :CsSsm),
         Int32,
-        (UInt32, Cint, Ptr{Int64}),
+        (UInt32, Cint, Ref{Int64}),
         hSystem,
         nChannelIndex,
         pi64Results,
