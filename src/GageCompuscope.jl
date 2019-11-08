@@ -2,7 +2,7 @@ module GageCompuscope
 
 include(joinpath(@__DIR__, "..", "LibGage", "LibGage.jl"))
 using .LibGage
-
+include("gage_functions.jl")
 include("gagecard.jl")
 include("transfer.jl")
 include("asynctransfer.jl")
