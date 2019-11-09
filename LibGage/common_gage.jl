@@ -183,7 +183,7 @@ end
 
 const PCSFILTERTABLE = Ptr{CSFILTERTABLE}
 
-mutable struct IN_PARAMS_TRANSFERDATA
+@cstruct IN_PARAMS_TRANSFERDATA {
     Channel::Cushort
     Mode::Cuint
     Segment::Cuint
@@ -191,10 +191,10 @@ mutable struct IN_PARAMS_TRANSFERDATA
     Length::Int64
     pDataBuffer::Ptr{Cvoid}
     hNotifyEvent::Ptr{Ptr{Cvoid}}
-end
-IN_PARAMS_TRANSFERDATA() =
-    IN_PARAMS_TRANSFERDATA(0, 0, 0, 0, 0, Ptr{Cvoid}(), C_NULL)
-IN_PARAMS_TRANSFERDATA(a::Array) = IN_PARAMS_TRANSFERDATA(a[1:end - 1]..., C_NULL)
+  };
+# IN_PARAMS_TRANSFERDATA() =
+#     IN_PARAMS_TRANSFERDATA(0, 0, 0, 0, 0, Ptr{Cvoid}(), C_NULL)
+# IN_PARAMS_TRANSFERDATA(a::Array) = IN_PARAMS_TRANSFERDATA(a[1:end - 1]..., C_NULL)
 
 struct IN_PARAMS_TRANSFERDATA2
     Channel::Cushort
