@@ -1,56 +1,52 @@
-mutable struct GageCard
-    gagehandle::Int
-    systeminfo::CSSYSTEMINFO
-    acquisition_config::CSACQUISITIONCONFIG
-    channel_config::Vector{CSCHANNELCONFIG}
-    trigger_config::Vector{CSTRIGGERCONFIG}
-    GageCard() = new()
-end
-# --
-function LibGage.CsGet(g::GageCard,
-    cfg::Union{CSACQUISITIONCONFIG,CSTRIGGERCONFIG,CSCHANNELCONFIG},
-)
-    LibGage.CsGet(g.gagehandle, cfg)
+cserror(code) = CsGetErrorString(code)
+
+@kwdef struct GageCard
+    gagehandle::Cuint
+    systeminfo::SystemInfo = SystemInfo()
+    acquisition_config::AcquisitionCfg = AcquisitionCfg()
+    channel_config::Vector{ChannelCfg} = ChannelCfg[]
+    trigger_config::Vector{TriggerCfg} = TriggerCfg[]
 end
 
 function get_systeminfo!(g::GageCard)
-    g.systeminfo = CSSYSTEMINFO()
+    g.systeminfo = SystemInfo()
     CsGetSystemInfo(g.gagehandle, g.systeminfo)
 end
 
-function get_configs!(g::GageCard)
-    st = CsGet(g, g.acquisition_config)
-    st < 1 && error("error getting acquisition_config: " * CsGetErrorString(st))
-    for chnl in g.channel_config
-        CsGet(g, chnl)
-    end
-    for trgr in g.trigger_config
-        CsGet(g, trgr)
-    end
-end
 
-function GageCard(board_index)
-    gage = GageCard()
-    m = Ref{Cuint}(0)
-
+function GageCard(initialize::Bool)
+    _handle = Ref{Cuint}()
     CsInitialize()
-    CsGetSystem(m, 0, 0, 0, board_index)
-    gage.gagehandle = Int(m[])
-    get_systeminfo!(gage)
-    gage.acquisition_config = CSACQUISITIONCONFIG()
+    st = CsGetSystem(_handle, 0, 0, 0, 0)
+    st < 0 && error("$(cserror(st))")
 
-    gage.channel_config = CSCHANNELCONFIG[]
-    for i = 1:gage.systeminfo.ChannelCount
-        push!(gage.channel_config, CSCHANNELCONFIG(Int(i)))
+    info = SystemInfo()
+    CsGetSystemInfo(_handle[], info)
+
+    acq = AcquisitionCfg()
+    st = CsGet(_handle[], CS_ACQUISITION, CS_CURRENT_CONFIGURATION, acq)
+
+    chnls = ChannelCfg[]
+    for i = 1:info.ChannelCount
+        chnl = ChannelCfg(i)
+        CsGet(_handle[], CS_CHANNEL, CS_CURRENT_CONFIGURATION, chnl)
+        push!(chnls, chnl)
     end
 
-    gage.trigger_config = CSTRIGGERCONFIG[]
-    for i = 1:gage.systeminfo.TriggerMachineCount
-        push!(gage.trigger_config, CSTRIGGERCONFIG(Int(i)))
+    trgrs = TriggerCfg[]
+    for i = 1:info.TriggerMachineCount
+        trgr = TriggerCfg(i)
+        push!(trgrs, trgr)
     end
-    get_configs!(gage)
 
-    return gage
+
+    return GageCard(
+        gagehandle = _handle[],
+        acquisition_config = acq,
+        systeminfo = info,
+        channel_config = chnls,
+        trigger_config = trgrs,
+    )
 end
 
 function free_system(g::GageCard)
@@ -78,19 +74,6 @@ function force(g::GageCard)
     CsDo(g.gagehandle, ACTION_FORCE)
 end
 
-
-"""
-    CsSet(g::GageCard, option)
-option ∈ [:all, :acquisition,:channel,:trigger]
-"""
-function set_cfg!(gage, cfg, option)
-    cfg = Symbol(option, :_config)
-    nidx = eval(Symbol("CS_", uppercase(string(option))))
-    @show Base.@locals
-    CsSet(gage.gagehandle, nidx, cfg)
-end
-
-
 function set_segmentsize(g::GageCard, nsegment)
     g.acquisition_config.Depth = nsegment
     g.acquisition_config.SegmentSize = nsegment
@@ -111,15 +94,18 @@ function set_samplerate(g::GageCard, samplerate)
 end
 
 const terminations = Dict("dc" => CS_COUPLING_DC, "ac" => CS_COUPLING_AC)
-const impedances = Dict("low" => CS_REAL_IMP_50_OHM,
+const impedances = Dict(
+    "low" => CS_REAL_IMP_50_OHM,
     "high" => CS_REAL_IMP_1M_OHM,
 )
 
-function set_channel!(g::GageCard,
+function set_channel!(
+    g::GageCard,
     index,
     range_mv::Int;
     impedance = "low",
-    termination = "ac",)
+    termination = "ac",
+)
     cfg::CSCHANNELCONFIG = g.channel_config[index]
     cfg.InputRange = range_mv
     cfg.Term = terminations[termination]
@@ -128,20 +114,24 @@ function set_channel!(g::GageCard,
     commit(g)
 end
 
-const trigger_conditions = Dict("rising" => CS_TRIG_COND_POS_SLOPE,
+const trigger_conditions = Dict(
+    "rising" => CS_TRIG_COND_POS_SLOPE,
     "falling" => CS_TRIG_COND_NEG_SLOPE,
     "pulse_width" => CS_TRIG_COND_PULSE_WIDTH,
 )
-const trigger_sources = Dict("1" => CS_TRIG_SOURCE_CHAN_1,
+const trigger_sources = Dict(
+    "1" => CS_TRIG_SOURCE_CHAN_1,
     "2" => CS_TRIG_SOURCE_CHAN_2,
     "external" => CS_TRIG_SOURCE_EXT,
     "off" => CS_TRIG_SOURCE_DISABLE,
 )
-function set_trigger!(g::GageCard,
+function set_trigger!(
+    g::GageCard,
     idx,
     level,
     source = "1";
-    condition = "rising",)
+    condition = "rising",
+)
     level > 100 && error("level is given as a percent of source. 0-100%")
     trgr = g.trigger_config[idx]
     trgr.Level = level
@@ -151,4 +141,18 @@ function set_trigger!(g::GageCard,
     commit(g)
 end
 
-cserror(code) = CsGetErrorString(code)
+# using Setfield
+# function Base.setproperty!(g::GageCard, cfg::Symbol, v)
+#     r = Regex(string(cfg),"i")
+#     s = match.(Ref(r), String.(fieldnames(AcquisitionCfg))) |> collect
+#     ch = match.(Ref(r), String.(fieldnames(ChannelCfg))) |> collect
+#     tr = match.(Ref(r), String.(fieldnames(TriggerCfg))) |> collect
+#
+#     A = findfirst(!isnothing,s))
+#     Ch = findfirst(!isnothing,s))
+#     Tr = findfirst(!isnothing,s))
+#
+#     !isnothing(A) && @set g.acquisition_config
+#
+#     # setfield!(g::GageCard,)
+# end

@@ -1,17 +1,37 @@
 module GageCompuscope
 using Reexport
-using CBinding
+using Base: @kwdef
 include(joinpath(@__DIR__, "..", "LibGage", "LibGage.jl"))
 @reexport using .LibGage
-include("gage_functions.jl")
+
+include("gage_objects.jl")
+include("gage_cconvert.jl")
 include("gagecard.jl")
 include("transfer.jl")
-include("asynctransfer.jl")
-include("streamtodisk.jl")
+# include("asynctransfer.jl")
 
-
-export GageCard, start, free_system, set_samplerate, set_segmentcount,
-  set_segmentsize,set_trigger!, get_status
-
+export GageCard,
+       free_system,
+       set_samplerate,
+       set_segmentcount,
+       set_cfg!,
+       set_segmentsize,
+       set_trigger!,
+       set_channel!,
+       get_status,
+       cserror,
+       start,
+       abort,
+       commit,
+       force
+export BoardInfo,
+       SystemInfo,
+       AcquisitionCfg,
+       ChannelCfg,
+       TriggerCfg,
+       InputParameters,
+       OutputParameters,
+       TransferData,
+       MultipleRecord, _IN, _OUT
 
 end

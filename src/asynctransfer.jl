@@ -1,8 +1,8 @@
-
 #------------------------------------------------------------------------------
 # Transfer Functions.
 #------------------------------------------------------------------------------
-function Base.unsafe_convert(::Type{Ptr{LibGage.IN_PARAMS_TRANSFERDATA}},
+function Base.unsafe_convert(
+    ::Type{Ptr{LibGage.IN_PARAMS_TRANSFERDATA}},
     m::LibGage.IN_PARAMS_TRANSFERDATA,
 )
     Base.unsafe_convert(Ptr{LibGage.IN_PARAMS_TRANSFERDATA}, Ref(m))

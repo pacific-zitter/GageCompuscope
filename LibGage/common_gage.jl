@@ -1,7 +1,4 @@
-const EVENT_Ptr{Cvoid} = Ptr{Cvoid}
-const SEM_Ptr{Cvoid} = Ptr{Cvoid}
-const MUTEX_Ptr{Cvoid} = Ptr{Cvoid}
-const FILE_Ptr{Cvoid} = Ptr{Cvoid}
+abstract type GageConfig end
 
 mutable struct CSBOARDINFO
     Size::UInt32
@@ -17,16 +14,6 @@ mutable struct CSBOARDINFO
     AddonHwOptions::UInt32
     BaseBoardHwOptions::UInt32
 end
-
-const PCSBOARDINFO = Ptr{CSBOARDINFO}
-
-mutable struct ARRAY_BOARDINFO
-    BoardCount::UInt32
-    aBoardInfo::NTuple{1,CSBOARDINFO}
-end
-
-const PARRAY_BOARDINFO = Ptr{ARRAY_BOARDINFO}
-
 mutable struct CSSYSTEMINFO
     Size::UInt32
     MaxMemory::Clonglong
@@ -42,15 +29,6 @@ mutable struct CSSYSTEMINFO
     ChannelCount::UInt32
     BoardCount::UInt32
 end
-
-CSSYSTEMINFO() = begin
-    o = CSSYSTEMINFO(zeros(7)..., ntuple(x->0, 32), zeros(5)...)
-    o.Size = sizeof(CSSYSTEMINFO)
-    return o
-end
-
-
-const PCSSYSTEMINFO = Ptr{CSSYSTEMINFO}
 
 mutable struct CSACQUISITIONCONFIG
     Size::UInt32
@@ -70,16 +48,7 @@ mutable struct CSACQUISITIONCONFIG
     TriggerHoldoff::Clonglong
     SampleOffset::Int32
     TimeStampConfig::UInt32
-    # SegmentCountHigh::Int32
 end
-
-CSACQUISITIONCONFIG() = begin
-    o = CSACQUISITIONCONFIG(zeros(fieldcount(CSACQUISITIONCONFIG))...)
-    o.Size = sizeof(CSACQUISITIONCONFIG)
-    return o
-end
-
-const PCSACQUISITIONCONFIG = Ptr{CSACQUISITIONCONFIG}
 
 mutable struct CSCHANNELCONFIG
     Size::UInt32
@@ -91,20 +60,6 @@ mutable struct CSCHANNELCONFIG
     DcOffset::Int32
     Calib::Int32
 end
-CSCHANNELCONFIG(channel) = begin
-    o = CSCHANNELCONFIG(zeros(fieldcount(CSCHANNELCONFIG))...)
-    o.Size = sizeof(CSCHANNELCONFIG)
-    o.ChannelIndex = channel
-    return o
-end
-const PCSCHANNELCONFIG = Ptr{CSCHANNELCONFIG}
-
-mutable struct ARRAY_CHANNELCONFIG
-    ChannelCount::UInt32
-    aChannel::NTuple{1,CSCHANNELCONFIG}
-end
-
-const PARRAY_CHANNELCONFIG = Ptr{ARRAY_CHANNELCONFIG}
 
 mutable struct CSTRIGGERCONFIG
     Size::UInt32
@@ -120,103 +75,16 @@ mutable struct CSTRIGGERCONFIG
     Filter::UInt32
     Relation::UInt32
 end
-CSTRIGGERCONFIG(number) = begin
-    o = CSTRIGGERCONFIG(zeros(fieldcount(CSTRIGGERCONFIG))...)
-    o.Size = sizeof(CSTRIGGERCONFIG)
-    o.TriggerIndex = number
-    return o
-end
 
-const PCSTRIGGERCONFIG = Ptr{CSTRIGGERCONFIG}
-
-mutable struct ARRAY_TRIGGERCONFIG
-    TriggerCount::UInt32
-    aTrigger::NTuple{1,CSTRIGGERCONFIG}
-end
-
-const PARRAY_TRIGGERCONFIG = Ptr{ARRAY_TRIGGERCONFIG}
-
-mutable struct CSSYSTEMCONFIG
-    Size::UInt32
-    pAcqCfg::PCSACQUISITIONCONFIG
-    pAChannels::PARRAY_CHANNELCONFIG
-    pATriggers::PARRAY_TRIGGERCONFIG
-end
-
-const PCSSYSTEMCONFIG = Ptr{CSSYSTEMCONFIG}
-
-mutable struct CSSAMPLERATETABLE
-    SampleRate::Clonglong
-    strText::NTuple{32,UInt8}
-end
-
-const PCSSAMPLERATETABLE = Ptr{CSSAMPLERATETABLE}
-
-mutable struct CSRANGETABLE
-    InputRange::UInt32
-    strText::NTuple{32,UInt8}
-    Reserved::UInt32
-end
-
-const PCSRANGETABLE = Ptr{CSRANGETABLE}
-
-mutable struct CSIMPEDANCETABLE
-    Imdepdance::UInt32
-    strText::NTuple{32,UInt8}
-    Reserved::UInt32
-end
-
-const PCSIMPEDANCETABLE = Ptr{CSIMPEDANCETABLE}
-
-mutable struct CSCOUPLINGTABLE
-    Coupling::UInt32
-    strText::NTuple{32,UInt8}
-    Reserved::UInt32
-end
-
-const PCSCOUPLINGTABLE = Ptr{CSCOUPLINGTABLE}
-
-mutable struct CSFILTERTABLE
-    LowCutoff::UInt32
-    HighCutoff::UInt32
-end
-
-const PCSFILTERTABLE = Ptr{CSFILTERTABLE}
-
-@cstruct IN_PARAMS_TRANSFERDATA {
+mutable struct IN_PARAMS_TRANSFERDATA
     Channel::Cushort
     Mode::Cuint
     Segment::Cuint
-    StartAddress::Int64
-    Length::Int64
+    StartAddress::Clonglong
+    Length::Clonglong
     pDataBuffer::Ptr{Cvoid}
     hNotifyEvent::Ptr{Ptr{Cvoid}}
-  };
-# IN_PARAMS_TRANSFERDATA() =
-#     IN_PARAMS_TRANSFERDATA(0, 0, 0, 0, 0, Ptr{Cvoid}(), C_NULL)
-# IN_PARAMS_TRANSFERDATA(a::Array) = IN_PARAMS_TRANSFERDATA(a[1:end - 1]..., C_NULL)
-
-struct IN_PARAMS_TRANSFERDATA2
-    Channel::Cushort
-    Mode::Cuint
-    Segment::Cuint
-    StartAddress::Cintmax_t
-    Length::Cintmax_t
-    pDataBuffer::Ptr{Cvoid}
-    hNotifyEvent::Ptr{Cvoid}
 end
-
-@cstruct AsyncTransfer {
-    channel::Cushort
-    Mode::Cuint
-    Segment::Cuint
-    StartAddress::Int64
-    Length::Int64
-    pDataBuffer::Ptr{Cvoid}
-}
-
-# AsyncTransfer(a::Array) = AsyncTransfer(a[1:end - 1]..., C_NULL)
-const PIN_PARAMS_TRANSFERDATA = Ptr{IN_PARAMS_TRANSFERDATA}
 
 mutable struct OUT_PARAMS_TRANSFERDATA
     ActualStart::Clonglong
@@ -224,12 +92,6 @@ mutable struct OUT_PARAMS_TRANSFERDATA
     LowPart::Int32
     HighPart::Int32
 end
-OUT_PARAMS_TRANSFERDATA() = OUT_PARAMS_TRANSFERDATA(0, 0, 0, 0)
-
-const POUT_PARAMS_TRANSFERDATA = Ptr{OUT_PARAMS_TRANSFERDATA}
-
-
-
 
 mutable struct IN_PARAMS_TRANSFERDATA_EX
     Channel::UInt16
@@ -247,7 +109,6 @@ mutable struct OUT_PARAMS_TRANSFERDATA_EX
     DataFormat1::UInt32
 end
 
-
 mutable struct CALLBACK_DATA
     Size::UInt32
     hSystem::UInt32
@@ -255,17 +116,12 @@ mutable struct CALLBACK_DATA
     Token::Int32
 end
 
-const PCALLBACK_DATA = Ptr{CALLBACK_DATA}
-const LPCsEventCallback = Ptr{Cvoid}
-
 mutable struct CSTIMESTAMP
     Hour::UInt16
     Minute::UInt16
     Second::UInt16
     Point1Second::UInt16
 end
-
-const PCSTIMESTAMP = Ptr{CSTIMESTAMP}
 
 mutable struct CSSIGSTRUCT
     Size::UInt32
@@ -283,13 +139,9 @@ mutable struct CSSIGSTRUCT
     TimeStamp::CSTIMESTAMP
 end
 
-const PCSSIGSTRUCT = Ptr{CSSIGSTRUCT}
-
 mutable struct CSDISKFILEHEADER
     cData::NTuple{512,UInt8}
 end
-
-const PCSDISKFILEHEADER = Ptr{CSDISKFILEHEADER}
 
 mutable struct CSSEGMENTTAIL
     TimeStamp::Clonglong
@@ -297,8 +149,6 @@ mutable struct CSSEGMENTTAIL
     Reserved1::Clonglong
     Reserved2::Clonglong
 end
-
-const PCSSEGMENTTAIL = Ptr{CSSEGMENTTAIL}
 
 mutable struct STREAMING_FILEHEADER
     Size::UInt32
@@ -316,8 +166,6 @@ mutable struct STREAMING_FILEHEADER
     AcqConfig::CSACQUISITIONCONFIG
 end
 
-const PSTREAMING_FILEHEADER = Ptr{STREAMING_FILEHEADER}
-
 mutable struct STMHEADER
     Size::UInt32
     CardIndex::UInt16
@@ -333,8 +181,6 @@ mutable struct STMHEADER
     CsAcqConfig::CSACQUISITIONCONFIG
 end
 
-const PSTMHEADER = Ptr{STMHEADER}
-
 mutable struct TRIGGERED_INFO_STRUCT
     Size::UInt32
     StartSegment::UInt32
@@ -342,8 +188,6 @@ mutable struct TRIGGERED_INFO_STRUCT
     BufferSize::UInt32
     pBuffer::Ptr{Int16}
 end
-
-const PTRIGGERED_INFO_STRUCT = Ptr{TRIGGERED_INFO_STRUCT}
 
 mutable struct CSPECONFIG
     Size::UInt32
@@ -354,8 +198,6 @@ mutable struct CSPECONFIG
     Offset::UInt32
 end
 
-const PCSPECONFIG = Ptr{CSPECONFIG}
-
 mutable struct CS_STRUCT_DATAFORMAT_INFO
     Size::UInt32
     Signed::UInt32
@@ -365,5 +207,3 @@ mutable struct CS_STRUCT_DATAFORMAT_INFO
     SampleOffset::Int32
     i32SampleRes::Int32
 end
-
-const PCS_STRUCT_DATAFORMAT_INFO = Ptr{CS_STRUCT_DATAFORMAT_INFO}
