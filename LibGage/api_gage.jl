@@ -70,7 +70,7 @@ function CsGetSystemCaps(hSystem, CapsId, pBuffer, BufferSize)
     ccall(
         (:CsGetSystemCaps, :CsSsm),
         Int32,
-        (UInt32, UInt32, Ptr{Cvoid}, Ref{Cuint}),
+        (UInt32, UInt32, Ptr{Cvoid}, Ptr{Cuint}),
         hSystem,
         CapsId,
         pBuffer,

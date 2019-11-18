@@ -83,7 +83,7 @@ mutable struct IN_PARAMS_TRANSFERDATA
     StartAddress::Clonglong
     Length::Clonglong
     pDataBuffer::Ptr{Cvoid}
-    hNotifyEvent::Ptr{Ptr{Cvoid}}
+    hNotifyEvent::Ptr{Cvoid}
 end
 
 mutable struct OUT_PARAMS_TRANSFERDATA

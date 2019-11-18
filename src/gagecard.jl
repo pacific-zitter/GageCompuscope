@@ -36,6 +36,7 @@ function GageCard(initialize::Bool)
     trgrs = TriggerCfg[]
     for i = 1:info.TriggerMachineCount
         trgr = TriggerCfg(i)
+        CsGet(_handle[], CS_TRIGGER, CS_CURRENT_CONFIGURATION, trgr)
         push!(trgrs, trgr)
     end
 
