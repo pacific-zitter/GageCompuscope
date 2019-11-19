@@ -76,21 +76,21 @@ mutable struct CSTRIGGERCONFIG
     Relation::UInt32
 end
 
-mutable struct IN_PARAMS_TRANSFERDATA
-    Channel::Cushort
-    Mode::Cuint
-    Segment::Cuint
-    StartAddress::Clonglong
-    Length::Clonglong
-    pDataBuffer::Ptr{Cvoid}
-    hNotifyEvent::Ptr{Cvoid}
+Base.@kwdef mutable struct IN_PARAMS_TRANSFERDATA
+    Channel::Cushort = 1
+    Mode::Cuint = TxMODE_DEFAULT
+    Segment::Cuint = 1
+    StartAddress::Clonglong = 0
+    Length::Clonglong = 0
+    pDataBuffer::Ptr{Cvoid} = C_NULL
+    hNotifyEvent::Ptr{Cvoid} = C_NULL
 end
 
-mutable struct OUT_PARAMS_TRANSFERDATA
-    ActualStart::Clonglong
-    ActualLength::Clonglong
-    LowPart::Int32
-    HighPart::Int32
+Base.@kwdef mutable struct OUT_PARAMS_TRANSFERDATA
+    ActualStart::Clonglong = 0
+    ActualLength::Clonglong = 0
+    LowPart::Int32 = 0
+    HighPart::Int32 = 0
 end
 
 mutable struct IN_PARAMS_TRANSFERDATA_EX

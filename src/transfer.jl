@@ -1,39 +1,22 @@
-@kwdef struct TransferData{T}
-    input::InputParameters = InputParameters()
-    output::OutputParameters = OutputParameters()
-    data::Array{T}
-    segrng::Base.OneTo
+function MultipleRecord(g::GageCard)
+    _acq = g.acquisition_config
+    data_array = Array{Int16,2}(undef, _acq.SegmentSize, _acq.SegmentCount)
+    _inp = IN_PARAMS_TRANSFERDATA(
+        StartAddress = _acq.SampleOffset,
+        Length = _acq.SegmentSize,
+        pDataBuffer = pointer(data_array),
+    )
+    _out = OUT_PARAMS_TRANSFERDATA()
+    MultipleRecord(g.gagehandle, data_array, _inp, _out)
 end
 
-function TransferData{T}(gage::GageCard, requested_chnl) where {T}
-    inp = InputParameters(
-        Channel = requested_chnl,
-        Segment = 1,
-        StartAddress = gage.acquisition_config.SampleOffset,
-        Length = gage.acquisition_config.SegmentSize,
-    )
-
-    tx = TransferData{T}(
-        input = inp,
-        data = Vector{Int16}(undef, inp.Length),
-        segrng = 1:gage.acquisition_config.SegmentCount,
-    )
-    tx.input.pDataBuffer = pointer(tx.data)
-    tx
+function LibGage.CsTransfer(r::MultipleRecord, g::GageCard)
+    for (i,d) in enumerate(eachcol(r.data_array))
+        r.input_gage.Segment = i
+        r.input_gage.pDataBuffer = pointer(d)
+        LibGage.CsTransfer(g.gagehandle, r.input_gage, r.output_gage)
+    end
 end
-
-# function InputParamaters(g::GageCard, requested_channel)
-#     inp = InputParamaters(Channel = requested_channel,)
-#     aq = g.acquisition_config
-#     inp.Channel = 1
-#     inp.Mode = TxMODE_DEFAULT
-#     inp.Segment = 1
-#     inp.StartAddress = aq.SampleOffset
-#     inp.Length = aq.SegmentSize
-#     xfer.segment_buffer = Vector{Int16}(undef, aq.SegmentSize)
-#     inp.pDataBuffer = pointer(xfer.segment_buffer)
-#     return xfer
-# end
 
 """
     acquire
@@ -70,22 +53,3 @@ Queries the driver until the status returns ready.
 #         status = get_status(g)
 #     end
 # end
-
-
-@kwdef mutable struct _IN
-    		u32Size::UInt32
-    		u32ActionId::UInt32	= 0
-    		u32StartSegment::UInt32 = 0
-    		u32EndSegment::UInt32 = 0
-    		pBuffer::Ptr{Cvoid}	= C_NULL
-    		i64BufferSize::Int64 = 0
-end
-
-@kwdef mutable struct _OUT
-		i64ActualBufferSize::Int64	# Buffer Size in bytes
-end
-
-@kwdef mutable struct MultipleRecord
-	inp::_IN
-	outp::_OUT
-end

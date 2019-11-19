@@ -32,6 +32,8 @@ export BoardInfo,
        InputParameters,
        OutputParameters,
        TransferData,
-       MultipleRecord, _IN, _OUT
+       MultipleRecord,
+       InputExpert,
+       OutputExpert
 
 end

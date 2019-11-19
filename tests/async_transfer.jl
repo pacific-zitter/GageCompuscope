@@ -1,6 +1,6 @@
 using GageCompuscope
 
-gage = GageCard()
+gage = GageCard(true)
 
 set_samplerate(gage, 10e6)
 set_segmentsize(gage, 10e6)
@@ -21,3 +21,8 @@ tok = Ref{Cint}()
 res = Ref{Int64}(0)
 CsGetTransferASResult(gage.gagehandle, tok[], res)
 CsFreeSystem(3939227)
+
+
+
+
+ccall((:CsExpertCall,:CsSsm),Cint,())

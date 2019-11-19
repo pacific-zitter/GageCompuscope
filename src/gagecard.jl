@@ -78,8 +78,9 @@ end
 function set_segmentsize(g::GageCard, nsegment)
     g.acquisition_config.Depth = nsegment
     g.acquisition_config.SegmentSize = nsegment
-    CsSet(g.gagehandle, CS_ACQUISITION, g.acquisition_config)
-    CsDo(g.gagehandle, ACTION_COMMIT)
+    st = CsSet(g.gagehandle, CS_ACQUISITION, g.acquisition_config)
+    st < 0 && error(cserror(st))
+    st = CsDo(g.gagehandle, ACTION_COMMIT)
 end
 
 function set_segmentcount(g::GageCard, n)

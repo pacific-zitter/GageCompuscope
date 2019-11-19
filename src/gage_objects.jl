@@ -2,18 +2,18 @@ abstract type CsConfig end
 abstract type CsData end
 
 @kwdef mutable struct BoardInfo <: CsConfig
-    Size::UInt32 = size
-    BoardIndex::UInt32
-    BoardType::UInt32
+    Size::UInt32 = 0
+    BoardIndex::UInt32 = 0
+    BoardType::UInt32 = 0
     strSerialNumber::NTuple{32,UInt8}
-    BaseBoardVersion::UInt32
-    BaseBoardFirmwareVersion::UInt32
-    AddonBoardVersion::UInt32
-    AddonBoardFirmwareVersion::UInt32
-    AddonFwOptions::UInt32
-    BaseBoardFwOptions::UInt32
-    AddonHwOptions::UInt32
-    BaseBoardHwOptions::UInt32
+    BaseBoardVersion::UInt32 = 0
+    BaseBoardFirmwareVersion::UInt32 = 0
+    AddonBoardVersion::UInt32 = 0
+    AddonBoardFirmwareVersion::UInt32 = 0
+    AddonFwOptions::UInt32 = 0
+    BaseBoardFwOptions::UInt32 = 0
+    AddonHwOptions::UInt32 = 0
+    BaseBoardHwOptions::UInt32 = 0
 end
 
 @kwdef mutable struct SystemInfo <: CsConfig
@@ -91,24 +91,11 @@ TriggerCfg(number) = begin
     return o
 end
 
-@kwdef mutable struct InputParameters <: CsData
-    Channel::Cushort
-    Mode::Cuint = TxMODE_DEFAULT
-    Segment::Cuint = 1
-    StartAddress::Int64 = 0
-    Length::Int64 = 0
-    pDataBuffer::Ptr{Cvoid} = C_NULL
-    # hNotifyEvent::Ptr{Ptr{Cvoid}}
-end
-
-# Base.convert(::Type{IN_PARAMS_TRANSFERDATA}, i::InputParamaters) =
-
-
-@kwdef mutable struct OutputParameters <: CsData
-    ActualStart::Clonglong = 0
-    ActualLength::Clonglong = 0
-    LowPart::Int32 = 0
-    HighPart::Int32 = 0
+@kwdef struct MultipleRecord
+    handle::Cuint
+    data_array::Array{Int16,2}
+    input_gage::IN_PARAMS_TRANSFERDATA
+    output_gage::OUT_PARAMS_TRANSFERDATA
 end
 
 @kwdef mutable struct InputExpert <: CsData
@@ -118,8 +105,9 @@ end
     SegmentCount::UInt32 = 0
     StartAddress::Clonglong = 0
     Length::Clonglong = 0
-    pDataBuffer::Ptr{Cvoid} = C_NULL
+    pDataBuffer::Ptr{Cshort} = C_NULL
     BufferLength::Clonglong = 0
+    notify_event::Ptr{Cvoid} = C_NULL
 end
 
 @kwdef mutable struct OutputExpert

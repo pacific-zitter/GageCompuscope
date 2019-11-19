@@ -69,8 +69,8 @@ CsGetSystemInfo(info) = CsGetSystemInfo(gagehandle[], info)
 function CsGetSystemCaps(hSystem, CapsId, pBuffer, BufferSize)
     ccall(
         (:CsGetSystemCaps, :CsSsm),
-        Int32,
-        (UInt32, UInt32, Ptr{Cvoid}, Ptr{Cuint}),
+        Cint,
+        (Cuint, Cuint, Ptr{Cvoid}, Ref{Cuint}),
         hSystem,
         CapsId,
         pBuffer,
