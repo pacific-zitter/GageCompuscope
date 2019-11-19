@@ -17,19 +17,19 @@ abstract type CsData end
 end
 
 @kwdef mutable struct SystemInfo <: CsConfig
-    Size                ::UInt32 = sizeof(CSSYSTEMINFO)
-    MaxMemory           ::Clonglong = 0
-    SampleBits          ::UInt32 = 0
-    SampleResolution    ::Int32 = 0
-    SampleSize          ::UInt32 = 0
-    SampleOffset        ::Int32 = 0
-    BoardType           ::UInt32 = 0
-    strBoardName        ::NTuple{32,UInt8} = ntuple(i->0x0,32)
-    AddonOptions        ::UInt32 = 0
-    BaseBoardOptions    ::UInt32 = 0
-    TriggerMachineCount ::UInt32 = 0
-    ChannelCount        ::UInt32 = 0
-    BoardCount          ::UInt32 = 0
+    Size::UInt32 = sizeof(CSSYSTEMINFO)
+    MaxMemory::Clonglong = 0
+    SampleBits::UInt32 = 0
+    SampleResolution::Int32 = 0
+    SampleSize::UInt32 = 0
+    SampleOffset::Int32 = 0
+    BoardType::UInt32 = 0
+    strBoardName::NTuple{32,UInt8} = ntuple(i -> 0x0, 32)
+    AddonOptions::UInt32 = 0
+    BaseBoardOptions::UInt32 = 0
+    TriggerMachineCount::UInt32 = 0
+    ChannelCount::UInt32 = 0
+    BoardCount::UInt32 = 0
 end
 
 @kwdef mutable struct AcquisitionCfg <: CsConfig

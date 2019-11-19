@@ -1,6 +1,7 @@
 module GageCompuscope
 using Reexport
 using Base: @kwdef
+
 include(joinpath(@__DIR__, "..", "LibGage", "LibGage.jl"))
 @reexport using .LibGage
 
@@ -8,7 +9,7 @@ include("gage_objects.jl")
 include("gage_cconvert.jl")
 include("gagecard.jl")
 include("transfer.jl")
-# include("asynctransfer.jl")
+
 
 export GageCard,
        free_system,
@@ -24,16 +25,13 @@ export GageCard,
        abort,
        commit,
        force
+
 export BoardInfo,
        SystemInfo,
        AcquisitionCfg,
        ChannelCfg,
        TriggerCfg,
-       InputParameters,
-       OutputParameters,
-       TransferData,
-       MultipleRecord,
-       InputExpert,
-       OutputExpert
+       MultipleRecord
+
 
 end

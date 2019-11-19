@@ -55,7 +55,7 @@ function CsSet(hSystem, nIndex, pData::T) where {T}
     )
 end
 
-function CsGetSystemInfo(hSystem, pSystemInfo::T) where T
+function CsGetSystemInfo(hSystem, pSystemInfo::T) where {T}
     ccall(
         (:CsGetSystemInfo, :CsSsm),
         Int32,
@@ -161,16 +161,11 @@ function CsTransferAS(hSystem, pInData, pOutParams, pToken)
     ccall(
         (:CsTransferAS, :CsSsm),
         Int32,
-        (
-         UInt32,
-         Ptr{Cvoid},
-         Ptr{Cvoid},
-         Ref{Int32},
-        ),
+        (UInt32, Ptr{Cvoid}, Ptr{Cvoid}, Ref{Int32}),
         hSystem,
         pInData,
         pOutParams,
-        pToken
+        pToken,
     )
 end
 

@@ -10,11 +10,11 @@ function MultipleRecord(g::GageCard)
     MultipleRecord(g.gagehandle, data_array, _inp, _out)
 end
 
-function LibGage.CsTransfer(r::MultipleRecord, g::GageCard)
+function CsTransfer(r::MultipleRecord, g::GageCard)
     for (i,d) in enumerate(eachcol(r.data_array))
         r.input_gage.Segment = i
         r.input_gage.pDataBuffer = pointer(d)
-        LibGage.CsTransfer(g.gagehandle, r.input_gage, r.output_gage)
+        CsTransfer(g.gagehandle, r.input_gage, r.output_gage)
     end
 end
 

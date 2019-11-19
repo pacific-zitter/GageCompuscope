@@ -13,7 +13,6 @@ function get_systeminfo!(g::GageCard)
     CsGetSystemInfo(g.gagehandle, g.systeminfo)
 end
 
-
 function GageCard(initialize::Bool)
     _handle = Ref{Cuint}()
     CsInitialize()
@@ -81,18 +80,25 @@ function set_segmentsize(g::GageCard, nsegment)
     st = CsSet(g.gagehandle, CS_ACQUISITION, g.acquisition_config)
     st < 0 && error(cserror(st))
     st = CsDo(g.gagehandle, ACTION_COMMIT)
+    st < 0 && error(cserror(st))
+    st
 end
 
 function set_segmentcount(g::GageCard, n)
     g.acquisition_config.SegmentCount = n
-    CsSet(g.gagehandle, CS_ACQUISITION, g.acquisition_config)
-    CsDo(g.gagehandle, ACTION_COMMIT)
+    st1 = CsSet(g.gagehandle, CS_ACQUISITION, g.acquisition_config)
+    st1 < 0 && error(cserror(st1))
+    st2 = CsDo(g.gagehandle, ACTION_COMMIT)
+    st2 < 0 && error(cserror(st2))
+    return 1
 end
 
 function set_samplerate(g::GageCard, samplerate)
     g.acquisition_config.SampleRate = samplerate
-    CsSet(g.gagehandle, CS_ACQUISITION, g.acquisition_config)
-    CsDo(g.gagehandle, ACTION_COMMIT)
+    st1 = CsSet(g.gagehandle, CS_ACQUISITION, g.acquisition_config)
+    st1 < 0 && error(cserror(st1))
+    st2 = CsDo(g.gagehandle, ACTION_COMMIT)
+    st2 < 0 && error(cserror(st2))
 end
 
 const terminations = Dict("dc" => CS_COUPLING_DC, "ac" => CS_COUPLING_AC)
@@ -142,19 +148,3 @@ function set_trigger!(
     CsSet(g.gagehandle, CS_TRIGGER, trgr)
     commit(g)
 end
-
-# using Setfield
-# function Base.setproperty!(g::GageCard, cfg::Symbol, v)
-#     r = Regex(string(cfg),"i")
-#     s = match.(Ref(r), String.(fieldnames(AcquisitionCfg))) |> collect
-#     ch = match.(Ref(r), String.(fieldnames(ChannelCfg))) |> collect
-#     tr = match.(Ref(r), String.(fieldnames(TriggerCfg))) |> collect
-#
-#     A = findfirst(!isnothing,s))
-#     Ch = findfirst(!isnothing,s))
-#     Tr = findfirst(!isnothing,s))
-#
-#     !isnothing(A) && @set g.acquisition_config
-#
-#     # setfield!(g::GageCard,)
-# end
