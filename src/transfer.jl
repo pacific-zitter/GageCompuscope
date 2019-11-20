@@ -10,20 +10,20 @@ function MultipleRecord(g::GageCard)
     MultipleRecord(g.gagehandle, data_array, _inp, _out)
 end
 
-Base.unsafe_convert(::Type{Ptr{G}},x::G) where {G<:GageConfig} =
-    Base.unsafe_convert(Ptr{G},Ref(x))
+Base.unsafe_convert(::Type{Ptr{G}}, x::G) where {G<:GageConfig} =
+    Base.unsafe_convert(Ptr{G}, Ref(x))
 
 function CsTransfer(r::MultipleRecord, g::GageCard)
     for (i, d) in enumerate(eachcol(r.data_array))
         r.input_gage.Segment = i
         r.input_gage.pDataBuffer = pointer(d)
-        @threadcall(
-            (:CsTransfer, :CsSsm),
+        ccall(
+            (:CsTransfer, csssm),
             Cint,
             (UInt32, Ptr{IN_PARAMS_TRANSFERDATA}, Ptr{OUT_PARAMS_TRANSFERDATA}) ,
             g.gagehandle,
             r.input_gage,
-            r.output_gage,
+            r.output_gage
         )
     end
 end

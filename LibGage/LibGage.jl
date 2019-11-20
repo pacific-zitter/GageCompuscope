@@ -1,5 +1,9 @@
 module LibGage
 using Base: @kwdef
+import Libdl
+
+const csssm = :CsSsm
+const csdisp = :CsDisp
 
 include("defines_gage.jl")
 include("common_gage.jl")
