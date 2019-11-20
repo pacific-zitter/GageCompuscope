@@ -23,6 +23,4 @@ CsGetTransferASResult(gage.gagehandle, tok[], res)
 CsFreeSystem(3939227)
 
 
-
-
 ccall((:CsExpertCall, :CsSsm), Cint, ())

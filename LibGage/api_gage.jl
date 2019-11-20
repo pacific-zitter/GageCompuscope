@@ -141,7 +141,7 @@ function event_handle(handle, eventtype, eventhandle)
 end
 
 function CsGetStatus(hSystem)
-    ccall((:CsGetStatus, :CsSsm), Int32, (UInt32,), hSystem)
+    @threadcall((:CsGetStatus, :CsSsm), Int32, (UInt32,), hSystem)
 end
 
 function CsGetErrorString(i32ErrorCode)

@@ -99,6 +99,7 @@ function set_samplerate(g::GageCard, samplerate)
     st1 < 0 && error(cserror(st1))
     st2 = CsDo(g.gagehandle, ACTION_COMMIT)
     st2 < 0 && error(cserror(st2))
+    1
 end
 
 const terminations = Dict("dc" => CS_COUPLING_DC, "ac" => CS_COUPLING_AC)

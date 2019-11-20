@@ -52,8 +52,17 @@ end
 
 gage = GageCard(true)
 set_samplerate(gage, 1e7)
-set_segmentsize(gage, 1e7)
-set_segmentcount(gage, 1)
+
+begin
+    acq = gage.acquisition_config
+    acq.SegmentSize = 8192
+    acq.Depth = 4192
+    CsSet(gage.gagehandle,CS_ACQUISITION,gage.acquisition_config)
+    commit(gage)
+end
+
+
+set_segmentcount(gage, 200)
 
 for i = 1:4
     @async transferData(gage)

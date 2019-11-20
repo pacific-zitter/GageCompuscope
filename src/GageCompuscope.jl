@@ -6,7 +6,6 @@ include(joinpath(@__DIR__, "..", "LibGage", "LibGage.jl"))
 @reexport using .LibGage
 
 include("gage_objects.jl")
-include("gage_cconvert.jl")
 include("gagecard.jl")
 include("transfer.jl")
 

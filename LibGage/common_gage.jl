@@ -76,7 +76,7 @@ mutable struct CSTRIGGERCONFIG
     Relation::UInt32
 end
 
-Base.@kwdef mutable struct IN_PARAMS_TRANSFERDATA
+Base.@kwdef mutable struct IN_PARAMS_TRANSFERDATA <: GageConfig
     Channel::Cushort = 1
     Mode::Cuint = TxMODE_DEFAULT
     Segment::Cuint = 1
@@ -86,7 +86,7 @@ Base.@kwdef mutable struct IN_PARAMS_TRANSFERDATA
     hNotifyEvent::Ptr{Cvoid} = C_NULL
 end
 
-Base.@kwdef mutable struct OUT_PARAMS_TRANSFERDATA
+Base.@kwdef mutable struct OUT_PARAMS_TRANSFERDATA <: GageConfig
     ActualStart::Clonglong = 0
     ActualLength::Clonglong = 0
     LowPart::Int32 = 0
