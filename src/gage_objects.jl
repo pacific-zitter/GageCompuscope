@@ -52,7 +52,6 @@ end
     TimeStampConfig::UInt32 = 0
 end
 
-
 @kwdef mutable struct ChannelCfg <: CsConfig
     Size::UInt32 = sizeof(CSCHANNELCONFIG)
     ChannelIndex::UInt32 = 0
@@ -187,29 +186,25 @@ end
     CsAcqConfig::CSACQUISITIONCONFIG
 end
 
-# @kwdef mutable struct TRIGGERED_INFO_STRUCT
-#     Size::UInt32
-#     StartSegment::UInt32
-#     NumOfSegments::UInt32
-#     BufferSize::UInt32
-#     pBuffer::Ptr{Int16}
-# end
-#
-# @kwdef mutable struct CSPECONFIG
-#     Size::UInt32
-#     Enable::UInt32
-#     InputType::UInt32
-#     EncodeMode::UInt32
-#     Step::UInt32
-#     Offset::UInt32
-# end
-#
-# @kwdef mutable struct CS_STRUCT_DATAFORMAT_INFO
-#     Size::UInt32
-#     Signed::UInt32
-#     Packed::UInt32
-#     SampleBits::UInt32
-#     SampleSize_Bits::UInt32
-#     SampleOffset::Int32
-#     i32SampleRes::Int32
-# end
+
+function Base.convert(::Type{CSACQUISITIONCONFIG},x::AcquisitionCfg)
+    a = Int64[]
+    foreach(fieldnames(AcquisitionCfg)) do f_name
+        push!(a,getfield(x,f_name))
+    end
+    CSACQUISITIONCONFIG(a...)
+end
+function Base.convert(::Type{CSCHANNELCONFIG},x::ChannelCfg)
+    a = Int64[]
+    foreach(fieldnames(ChannelCfg)) do f_name
+        push!(a,getfield(x,f_name))
+    end
+    CSCHANNELCONFIG(a...)
+end
+function Base.convert(::Type{CSTRIGGERCONFIG},x::TriggerCfg)
+    a = Int64[]
+    foreach(fieldnames(TriggerCfg)) do f_name
+        push!(a,getfield(x,f_name))
+    end
+    CSTRIGGERCONFIG(a...)
+end

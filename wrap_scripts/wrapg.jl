@@ -18,13 +18,13 @@ args = vcat(
 
 wc = init(;headers = hdrs,
             clang_args= args,
-            output_file="apii.jl",
-            common_file="cmmn.jl",
+            output_file=joinpath(@__DIR__,"apii.jl"),
+            common_file=joinpath(@__DIR__,"cmmn.jl"),
             header_library=x->"CsSsm",
             header_wrapped = (root,current)-> startswith(splitpath(current)[end],"Cs"),
             clang_diagnostics = true)
 
-run(wc);
+run(wc,false);
 
 
 # parse_headers!(ctx,wc.headers,args=wc.clang_args)

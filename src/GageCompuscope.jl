@@ -7,6 +7,7 @@ include(joinpath(@__DIR__, "..", "LibGage", "LibGage.jl"))
 
 include("gage_objects.jl")
 include("gagecard.jl")
+include("gageinterface.jl")
 include("transfer.jl")
 
 

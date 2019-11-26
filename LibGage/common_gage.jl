@@ -14,6 +14,7 @@ mutable struct CSBOARDINFO
     AddonHwOptions::UInt32
     BaseBoardHwOptions::UInt32
 end
+
 mutable struct CSSYSTEMINFO
     Size::UInt32
     MaxMemory::Clonglong

@@ -47,7 +47,7 @@ function CsGet(hSystem, nIndex, nConfig, pData::T) where {T}
     )
 end
 
-function CsSet(hSystem, nIndex, pData::T) where {T}
+function CsSet(hSystem::UInt32, nIndex::Integer, pData::T) where {T}
     ccall(
         (:CsSet, csssm),
         Int32,
@@ -126,7 +126,7 @@ function CsGetEventHandle(hSystem, u32EventType, phEvent)
     ccall(
         (:CsGetEventHandle, csssm),
         Int32,
-        (UInt32, UInt32, Ref{Threads.Event}),
+        (UInt32, UInt32, Ptr{Cvoid}),
         hSystem,
         u32EventType,
         phEvent,
@@ -161,14 +161,14 @@ function CsGetErrorString(i32ErrorCode)
 end
 
 function CsTransferAS(hSystem, pInData, pOutParams, pToken)
-    ccall(
+    @threadcall(
         (:CsTransferAS, csssm),
         Int32,
-        (UInt32, Ptr{Cvoid}, Ptr{Cvoid}, Ref{Int32}),
+        (UInt32, Ptr{IN_PARAMS_TRANSFERDATA}, Ptr{OUT_PARAMS_TRANSFERDATA}, Ptr{Cuint}),
         hSystem,
         pInData,
         pOutParams,
-        pToken,
+        pToken
     )
 end
 
@@ -176,7 +176,7 @@ function CsGetTransferASResult(hSystem, nChannelIndex, pi64Results)
     ccall(
         (:CsGetTransferASResult, csssm),
         Int32,
-        (UInt32, Ref{Cint}, Ptr{Int64}),
+        (UInt32, Int32, Ptr{Int64}),
         hSystem,
         nChannelIndex,
         pi64Results,

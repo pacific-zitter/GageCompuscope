@@ -1,19 +1,20 @@
 cserror(code) = CsGetErrorString(code)
 
-@kwdef struct GageCard
+mutable struct GageCard
     gagehandle::Cuint
-    systeminfo::SystemInfo = SystemInfo()
-    acquisition_config::AcquisitionCfg = AcquisitionCfg()
-    channel_config::Vector{ChannelCfg} = ChannelCfg[]
-    trigger_config::Vector{TriggerCfg} = TriggerCfg[]
+    systeminfo::SystemInfo
+    acquisition_config::AcquisitionCfg
+    channel_config::Vector{ChannelCfg}
+    trigger_config::Vector{TriggerCfg}
 end
+
 
 function get_systeminfo!(g::GageCard)
     g.systeminfo = SystemInfo()
     CsGetSystemInfo(g.gagehandle, g.systeminfo)
 end
 
-function GageCard(initialize::Bool)
+function GageCard()
     _handle = Ref{Cuint}()
     CsInitialize()
     st = CsGetSystem(_handle, 0, 0, 0, 0)
@@ -40,13 +41,7 @@ function GageCard(initialize::Bool)
     end
 
 
-    return GageCard(
-        gagehandle = _handle[],
-        acquisition_config = acq,
-        systeminfo = info,
-        channel_config = chnls,
-        trigger_config = trgrs,
-    )
+    return GageCard(_handle[], info, acq, chnls, trgrs)
 end
 
 function free_system(g::GageCard)
@@ -103,10 +98,8 @@ function set_samplerate(g::GageCard, samplerate)
 end
 
 const terminations = Dict("dc" => CS_COUPLING_DC, "ac" => CS_COUPLING_AC)
-const impedances = Dict(
-    "low" => CS_REAL_IMP_50_OHM,
-    "high" => CS_REAL_IMP_1M_OHM,
-)
+const impedances =
+    Dict("low" => CS_REAL_IMP_50_OHM, "high" => CS_REAL_IMP_1M_OHM)
 
 function set_channel!(
     g::GageCard,

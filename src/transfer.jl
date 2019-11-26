@@ -20,10 +20,10 @@ function CsTransfer(r::MultipleRecord, g::GageCard)
         ccall(
             (:CsTransfer, csssm),
             Cint,
-            (UInt32, Ptr{IN_PARAMS_TRANSFERDATA}, Ptr{OUT_PARAMS_TRANSFERDATA}) ,
+            (UInt32, Ptr{IN_PARAMS_TRANSFERDATA}, Ptr{OUT_PARAMS_TRANSFERDATA}),
             g.gagehandle,
             r.input_gage,
-            r.output_gage
+            r.output_gage,
         )
     end
 end
