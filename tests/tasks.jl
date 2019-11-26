@@ -2,24 +2,24 @@ using GageCompuscope
   using JLD2, FileIO
   using Dates
 
-# begin #Settings and structure initialization.
-gage = GageCard()
+begin #Settings and structure initialization.
+    gage = GageCard()
 
-A = gage.acquisition_config
-C = gage.channel_config[1]
-TR = gage.trigger_config[1]
+    A = gage.acquisition_config
 
-A.SampleRate = 1e7
-A.Depth = A.SegmentSize = 1e5
-A.Mode = CS_MODE_SINGLE
-A.SegmentCount = 100
-CsSet(gage)
-commit(gage)
+    A.SampleRate = 1e8
+    A.Depth = A.SegmentSize = 1e5
+    A.Mode = CS_MODE_SINGLE
+    A.SegmentCount = 100
 
-note = [0]
-M = MultipleRecord(gage)
-M.input_gage.hNotifyEvent = pointer(note)
-# end
+    CsSet(gage)
+    commit(gage)
+
+    note = [C_NULL]
+    M = MultipleRecord(gage)
+    M.input_gage.hNotifyEvent = Ref(C_NULL)[]
+end
+
 
 begin # Setup folder and make a unique filename.
     holderfolder = mkpath(joinpath(homedir(),".gingercode"))
@@ -31,27 +31,18 @@ begin # Setup folder and make a unique filename.
 end
 
 function getData(g::GageCard, m::MultipleRecord)
-    for (i, d) in enumerate(eachcol(m.data_array))
-        m.input_gage.Segment = i
-        m.input_gage.pDataBuffer = pointer(d)
-        ccall(
-            (:CsTransferAS, :CsSsm),
-            Cint,
-            (Cuint, Ref{IN_PARAMS_TRANSFERDATA}, Ref{OUT_PARAMS_TRANSFERDATA}),
-            g.gagehandle,
-            m.input_gage,
-            m.output_gage,
-            Ref(0)
-        )
-    end
-    m.data_array
+    CsTransfer(m,g)
+    return m.data_array
 end
-start(gage)
-get_status(gage)
 
-getData(gage,M)
 
 canacquire = Base.Condition()
+cntr = Ref(0)
+@async while true
+    wait(canacquire)
+    cntr[]+=1
+    @info "CAN ACQUIRE $(cntr[])"
+end
 
 begin # Channels and communication.
     lines = Channel(32)
@@ -101,8 +92,6 @@ end
 xtask = @async transferData(gage, M)
 
 stask = @async saveData()
-start(gage)
-getData(gage,M)
 
 h1 = @async acquire_data(gage)
 
@@ -113,13 +102,12 @@ close(imgio)
 
 
 abort(gage)
-q = load(image_filename)
 
-cntr = Ref(0)
-@async while true
-    wait(canacquire)
-    cntr[]+=1
-    @info "CAN ACQUIRE $(cntr[])"
-end
+q = load(joinpath(holderfolder,image_filename))
+
+ll= q["image/line0001"]
+mline=ll[:,1]
+
+plot(mline)
 
 free_system(gage)

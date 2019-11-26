@@ -5,7 +5,8 @@ const gage_index = Dict(
     CSCHANNELCONFIG => CS_CHANNEL,
     CSSYSTEMINFO => CS_BOARD_INFO,
 )
-Base.convert(::UInt32,g::GageCard) = g.gagehandle
+
+Base.convert(::T,g::GageCard) where {T<:Integer} = convert(Int,g.gagehandle)
 CsSet(g::GageCard, a::AcquisitionCfg) = LibGage.CsSet(g.gagehandle,CS_ACQUISITION,a)
 CsSet(g::GageCard, a::TriggerCfg) = LibGage.CsSet(g.gagehandle,CS_TRIGGER,a)
 CsSet(g::GageCard, a::ChannelCfg) = LibGage.CsSet(g.gagehandle,CS_CHANNEL,a)

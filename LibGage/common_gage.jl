@@ -83,7 +83,7 @@ Base.@kwdef mutable struct IN_PARAMS_TRANSFERDATA <: GageConfig
     Segment::Cuint = 1
     StartAddress::Clonglong = 0
     Length::Clonglong = 0
-    pDataBuffer::Ptr{Cvoid} = C_NULL
+    pDataBuffer::Ptr{Int16} = C_NULL
     hNotifyEvent::Ptr{Cvoid} = C_NULL
 end
 

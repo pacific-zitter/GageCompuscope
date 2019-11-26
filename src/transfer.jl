@@ -10,8 +10,10 @@ function MultipleRecord(g::GageCard)
     MultipleRecord(g.gagehandle, data_array, _inp, _out)
 end
 
-Base.unsafe_convert(::Type{Ptr{G}}, x::G) where {G<:GageConfig} =
-    Base.unsafe_convert(Ptr{G}, Ref(x))
+
+function Base.unsafe_convert(::Type{Ptr{G}},g::G) where {G<:GageConfig}
+    Base.unsafe_convert(Ptr{G},Ref(g))
+end
 
 function CsTransfer(r::MultipleRecord, g::GageCard)
     for (i, d) in enumerate(eachcol(r.data_array))
