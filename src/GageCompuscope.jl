@@ -31,7 +31,9 @@ export BoardInfo,
        AcquisitionCfg,
        ChannelCfg,
        TriggerCfg,
-       MultipleRecord
+       MultipleRecord,
+       NoNotify,
+       dataReady
 
 
 end

@@ -89,7 +89,7 @@ function CsTransfer(hSystem, pInData, outData)
     ccall(
         (:CsTransfer, csssm),
         Int32,
-        (UInt32, Ref{IN_PARAMS_TRANSFERDATA}, Ref{OUT_PARAMS_TRANSFERDATA}),
+        (UInt32, Ptr{IN_PARAMS_TRANSFERDATA}, Ptr{OUT_PARAMS_TRANSFERDATA}),
         hSystem,
         pInData,
         outData,
@@ -144,7 +144,7 @@ function event_handle(handle, eventtype, eventhandle)
 end
 
 function CsGetStatus(hSystem)
-    @threadcall((:CsGetStatus, csssm), Int32, (UInt32,), hSystem)
+    ccall((:CsGetStatus, csssm), Int32, (UInt32,), hSystem)
 end
 
 function CsGetErrorString(i32ErrorCode)

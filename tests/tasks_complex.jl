@@ -2,39 +2,36 @@ using GageCompuscope
   using JLD2, FileIO
   using Dates
 
+gage = GageCard()
 begin #Settings and structure initialization.
-    gage = GageCard()
-
     A = gage.acquisition_config
 
     A.SampleRate = 1e8
-    A.Depth = A.SegmentSize = 1e5
+    A.TriggerHoldoff = 4096
+    A.SegmentSize = A.Depth = 8192
     A.Mode = CS_MODE_SINGLE
-    A.SegmentCount = 100
+    A.SegmentCount = 1000
 
     CsSet(gage)
-    commit(gage)
-
+    st = commit(gage)
+    st < 0 && error(cserror(st))
     note = [C_NULL]
     M = MultipleRecord(gage)
     M.input_gage.hNotifyEvent = Ref(C_NULL)[]
 end
 
-
-begin # Setup folder and make a unique filename.
-    holderfolder = mkpath(joinpath(homedir(),".gingercode"))
+function makegingerfile()
+    folder = mkpath(joinpath(homedir(),".gingercode"))
     date = now()
     r = Dates.format(date,dateformat"yyyymmdd-HMM")
     image_filename = "trefm"*r*".jld2"
-    imgio = jldopen(joinpath(holderfolder,image_filename),"w")
-    imgio["parameters"] = gage
+    return joinpath(folder,image_filename)
 end
 
 function getData(g::GageCard, m::MultipleRecord)
-    CsTransfer(m,g)
+    CsTransfer(g, m)
     return m.data_array
 end
-
 
 canacquire = Base.Condition()
 cntr = Ref(0)
@@ -63,6 +60,8 @@ begin # Task definitions
             start(g)
             timedwait(() -> datacomplete(g), 10.0)
             put!(donebusy, l)
+            iid = current_task()
+            @info "transfered from task $iid"
             wait(canacquire)
         end
     end
@@ -89,10 +88,13 @@ begin # Task definitions
     end
 end
 
-xtask = @async transferData(gage, M)
+for i=1:8
+    @async transferData(gage, M)
+end
 
-stask = @async saveData()
-
+stask = for _ in 1:8
+     @async saveData()
+end
 h1 = @async acquire_data(gage)
 
 close(lines)

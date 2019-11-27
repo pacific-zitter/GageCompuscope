@@ -93,7 +93,7 @@ end
 @kwdef struct MultipleRecord
     handle::Cuint
     data_array::Array{Int16,2}
-    input_gage::IN_PARAMS_TRANSFERDATA
+    input_gage
     output_gage::OUT_PARAMS_TRANSFERDATA
 end
 

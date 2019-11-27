@@ -1,21 +1,20 @@
+
 function MultipleRecord(g::GageCard)
     _acq = g.acquisition_config
     data_array = Array{Int16,2}(undef, _acq.SegmentSize, _acq.SegmentCount)
     _inp = IN_PARAMS_TRANSFERDATA(
         StartAddress = _acq.SampleOffset,
         Length = _acq.SegmentSize,
-        pDataBuffer = pointer(data_array),
+        pDataBuffer = pointer(data_array)
     )
     _out = OUT_PARAMS_TRANSFERDATA()
     MultipleRecord(g.gagehandle, data_array, _inp, _out)
 end
 
-
-function Base.unsafe_convert(::Type{Ptr{G}},g::G) where {G<:GageConfig}
-    Base.unsafe_convert(Ptr{G},Ref(g))
+function Base.unsafe_convert(::Type{Ptr{G}}, g::G) where {G<:GageConfig}
+    Base.unsafe_convert(Ptr{G}, Ref(g))
 end
-
-function CsTransfer(r::MultipleRecord, g::GageCard)
+function LibGage.CsTransfer(g::GageCard, r::MultipleRecord)
     for (i, d) in enumerate(eachcol(r.data_array))
         r.input_gage.Segment = i
         r.input_gage.pDataBuffer = pointer(d)
@@ -28,6 +27,10 @@ function CsTransfer(r::MultipleRecord, g::GageCard)
             r.output_gage,
         )
     end
+end
+
+function dataReady(g::GageCard)
+    !(get_status(g) > 0)
 end
 
 """
