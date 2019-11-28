@@ -1,5 +1,6 @@
 module GageCompuscope
 using Reexport
+using TimerOutputs
 using Base: @kwdef
 
 include(joinpath(@__DIR__, "..", "LibGage", "LibGage.jl"))
@@ -26,14 +27,16 @@ export GageCard,
        commit,
        force
 
-export BoardInfo,
+export CsConfig,
+      BoardInfo,
        SystemInfo,
        AcquisitionCfg,
        ChannelCfg,
        TriggerCfg,
        MultipleRecord,
        NoNotify,
-       dataReady
+       dataReady,
+       to_voltage
 
 
 end

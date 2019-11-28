@@ -1,33 +1,31 @@
 using GageCompuscope
-
-
+using TimerOutputs
 gage = GageCard()
+
 begin #Settings and structure initialization.
     A = gage.acquisition_config
 
-    A.SampleRate = 1e8
+    A.SampleRate = 2e8
     A.TriggerHoldoff = 0
-    A.SegmentSize = A.Depth = 1e5
+    A.SegmentSize = A.Depth = 8192
     A.Mode = CS_MODE_SINGLE
-    A.SegmentCount = 10
-
+    A.SegmentCount = 1
+    c1 = gage.channel_config[1]
+    c1.Term = CS_COUPLING_DC
+    c1.Filter = 0
+    c1.Impedance = CS_REAL_IMP_50_OHM
+    c1.InputRange = CS_GAIN_1_V
     CsSet(gage)
     st = commit(gage)
     st < 0 && error(cserror(st))
 end
 
+C1 = MultipleRecord(gage)
 
-M = MultipleRecord(gage)
 start(gage)
-get_status(gage)
+timedwait(()->get_status(gage)<1,10.0)
+const to = TimerOutput()
 
-for (i,d) in enumerate(eachcol(M.data_array))
-    M.input_gage.Segment = i
-    M.input_gage.pDataBuffer = pointer(d)
-    st=ccall((:CsTransfer, csssm),Cint,(Cuint,Ref{IN_PARAMS_TRANSFERDATA},Ptr{OUT_PARAMS_TRANSFERDATA}),gage.gagehandle,M.input_gage,M.output_gage)
-end
 
-using Plots
-M
-plotly()
-p1=plot(M.data_array[:,1])
+
+C1(1)

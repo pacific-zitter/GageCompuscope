@@ -19,7 +19,23 @@ function CsSet(g::GageCard)
         st < 0 && error(cserror(st))
     end
     foreach(g.trigger_config) do tr
+
         st=CsSet(g,tr)
         st < 0 && error(cserror(st))
     end
+end
+
+function Base.iterate(Cs::C,state=1) where {C <: CsConfig}
+    state >= fieldcount(C) ? nothing : (getfield(Cs,fieldname(C,state)),state+1)
+end
+
+Base.length(cfg::C) where {C<:CsConfig} = fieldcount(C)
+Base.eltype(::Type{CsConfig}) = Union{Integer,NTuple{Integer,N}} where N
+
+Base.getindex(cfg::C, i::Int) where {C<:CsConfig} = getproperty(cfg, i)
+Base.getindex(cfg::C, i::AbstractString) where {C<:CsConfig} = getfield(cfg, Symbol(i))
+
+function Base.setindex!(cfg::C,v,f::Union{Int64,AbstractString}) where {C<:CsConfig}
+    v = convert(fieldtype(C,Symbol(f)),v)
+    nm = setproperty!(cfg,Symbol(f),v)
 end
