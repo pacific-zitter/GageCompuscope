@@ -18,10 +18,10 @@ end
 
 function (mult::MultipleRecord)(channel)
     mult.input_gage.Channel = channel
-    for (i, d) in enumerate(eachcol(mult.data_array))
+    for i in axes(mult.data_array,2)
         mult.input_gage.Segment = i
-        mult.input_gage.pDataBuffer = pointer(d)
-        st = ccall(
+        mult.input_gage.pDataBuffer = pointer(view(mult.data_array,:,i))
+        st =  ccall(
             (:CsTransfer, csssm),
             Cint,
             (Cuint, Ref{IN_PARAMS_TRANSFERDATA}, Ptr{OUT_PARAMS_TRANSFERDATA}),
@@ -101,8 +101,24 @@ function to_voltage(
 )
 
     scale_factor = float(input_range) / float(CS_GAIN_2_V)
-    out= @. ((sample_offset - adc_code)*inv(float(resolution)) * scale_factor) + (dc_offset*1e-3)
-    
+    out = @. ((sample_offset - adc_code) * inv(float(resolution)) *
+              scale_factor) + (dc_offset * 1e-3)
+
+end
+
+function to_voltage!(
+    output,
+    adc_code,
+    sample_offset,
+    resolution,
+    input_range,
+    dc_offset,
+)
+
+    scale_factor = float(input_range) / float(CS_GAIN_2_V)
+    @. output = ((sample_offset - adc_code) * inv(float(resolution)) *
+                 scale_factor) + (dc_offset * 1e-3)
+
 end
 
 """
