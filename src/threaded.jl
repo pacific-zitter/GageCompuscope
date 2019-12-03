@@ -56,10 +56,10 @@ function trigger_thread(A::Acquire; timeout = 1.0, interval = 1e-6)
 end
 
 function save_data(A::Acquire)
-    mkdir(joinpath(homedir(),".gingerlab"))
+    # mkdir(joinpath(homedir(),".gingerlab"))
     filename = "gl_"*splitdir(tempname())[end]*".jld2"
     sav_count = Ref(0)
-    jldopen(joinpath(homedir(),".gingerlab",filename),"w+",compress=true) do jf
+    jldopen(joinpath(homedir(),".gingerlab",filename),"w+") do jf
         while true
             d = take!(A.data)
             lname = "line"*lpad(sav_count[],4,'0')
