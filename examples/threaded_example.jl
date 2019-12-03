@@ -1,9 +1,6 @@
 Base.include(joinpath(@__DIR__,"initgage_default.jl"))
 using GageCompuscope: Acquire, untilReady, transfer_thread, trigger_thread
 
-
-
-
 begin # acquire sychronization objects
     isAcquiring = Channel(1)
     acqReady = Channel(1)

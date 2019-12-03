@@ -1,4 +1,3 @@
-
 function MultipleRecord(g::GageCard, chnl::Int)
     _acq = g.acquisition_config
     data_array = Array{Int16,2}(undef, _acq.SegmentSize, _acq.SegmentCount)
@@ -48,7 +47,6 @@ function LibGage.CsTransfer(g::GageCard, r::MultipleRecord)
         )
     end
 end
-
 
 """
     to_voltage(adc_code, sample_offset, resolution, full_scale_voltage,dc_offset)

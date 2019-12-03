@@ -1,19 +1,22 @@
 Base.include(@__MODULE__,joinpath(@__DIR__,"initgage_default.jl"))
 using GageCompuscope: Acquire, untilReady, transfer_thread, trigger_thread
-gage
-A = Acquire(gage,1024)
+using Plots;plotlyjs()
 
-x1 = @async transfer_thread(A)
+A = Acquire(gage,256)
 
+for _ in 1:4
+    x1 = Threads.@spawn transfer_thread(A)
+end
+s1 = @async save_data(A)
 a1 = @async trigger_thread(A)
+close(A.data)
+img = [take!(A.data) for i=1:256]
 
-y = A.data |> collect
+chnl1 = map(first,img)
 
-using Plots
 
-ch1 = map(first,y)
-ch2 = map(last,y)
-p1 = plot(ch1[1])
-p2 = plot(ch2[2])
+using JLD2
+y = @eval readdir(joinpath(homedir(),".gingerlab"))
+y = jldopen("C:/Users/jarrison/.gingerlab/gl_jl_E48D.tmp.jld2")
 
-p3 = plot(p1,p2,layout=(2,1))
+display(y)

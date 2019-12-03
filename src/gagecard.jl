@@ -6,7 +6,6 @@ mutable struct GageCard
     trigger_config::Vector{TriggerCfg}
 end
 
-
 function get_systeminfo!(g::GageCard)
     g.systeminfo = SystemInfo()
     CsGetSystemInfo(g.gagehandle, g.systeminfo)
@@ -46,6 +45,9 @@ function free_system(g::GageCard)
     CsFreeSystem(g.gagehandle)
 end
 
+#-------------------------------------------------------------------------------
+# Card Actions
+#-------------------------------------------------------------------------------
 function start(g::GageCard)
     st = CsDo(g.gagehandle, ACTION_START)
     st < 1 && error(cserror(st))
@@ -68,6 +70,7 @@ end
 function force(g::GageCard)
     CsDo(g.gagehandle, ACTION_FORCE)
 end
+#-------------------------------------------------------------------------------
 
 function set_segmentsize(g::GageCard, nsegment)
     g.acquisition_config.Depth = nsegment

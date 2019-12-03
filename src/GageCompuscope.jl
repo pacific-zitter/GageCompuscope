@@ -14,7 +14,9 @@ include("gageinterface.jl")
 include("transfer.jl")
 include("events.jl")
 include("threaded.jl")
-export getGageEvent, win32wait,win32reset,handle_events,dataComplete,hybrid_sleep
+
+export getGageEvent, win32wait,win32reset,handle_events,dataComplete,hybrid_sleep,
+      save_data
 
 export GageCard,free_system,set_samplerate,set_segmentcount,set_cfg!,
       set_segmentsize,set_trigger!,set_channel!,get_status,cserror,start,abort,

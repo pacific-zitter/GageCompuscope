@@ -1,4 +1,4 @@
-@kwdef mutable struct Acquire
+mutable struct Acquire
     gagecard::GageCard
     isAcquiring::Channel
     acqReady::Channel
@@ -22,8 +22,8 @@ function untilReady(G::GageCard; to = 1.0, interval = 10e-6)
     cb() = ccall((:CsGetStatus, csssm), Cint, (Cuint,), G.gagehandle) == 0
     while true
         cb() && break
-        hybrid_sleep(10e-6)
         yield()
+        hybrid_sleep(10e-6)
     end
 end
 
@@ -40,7 +40,7 @@ function transfer_thread(A::Acquire)
     end
 end
 
-function trigger_thread(A::Acquire; timeout = 1.0, interval = 10e-3)
+function trigger_thread(A::Acquire; timeout = 1.0, interval = 1e-6)
     acqCount = Ref(0)
     cb() = get_status(A.gagecard) < 1
     while true
@@ -48,9 +48,23 @@ function trigger_thread(A::Acquire; timeout = 1.0, interval = 10e-3)
         acqCount[] > A.data.sz_max && break
         put!(A.isAcquiring, :ok)
         start(A.gagecard)
-        untilReady(A.gagecard; interval = 1e-6)
+        untilReady(A.gagecard; interval = interval)
         put!(A.acqReady, :ok)
         take!(A.transferDone)
         acqCount[] += 1
+    end
+end
+
+function save_data(A::Acquire)
+    mkdir(joinpath(homedir(),".gingerlab"))
+    filename = "gl_"*splitdir(tempname())[end]*".jld2"
+    sav_count = Ref(0)
+    jldopen(joinpath(homedir(),".gingerlab",filename),"w+",compress=true) do jf
+        while true
+            d = take!(A.data)
+            lname = "line"*lpad(sav_count[],4,'0')
+            jf[lname] = d
+            sav_count[]+=1
+        end
     end
 end
