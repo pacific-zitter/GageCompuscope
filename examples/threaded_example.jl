@@ -1,36 +1,8 @@
-using GageCompuscope
-using TimerOutputs
-gage= GageCard()
+Base.include(joinpath(@__DIR__,"initgage_default.jl"))
+using GageCompuscope: Acquire, untilReady, transfer_thread, trigger_thread
 
-begin # settings.
-    A = gage.acquisition_config
-    channel1 = gage.channel_config[1]
-    channel2 = gage.channel_config[2]
-    A["SampleRate"] = 2e8
-    A["SegmentSize"] = A["Depth"] = 81920
-    A["SegmentCount"] = 1
-    A["Mode"] = CS_MODE_DUAL
 
-    channel1.InputRange = channel2.InputRange = CS_GAIN_2_V
-    channel2.Filter = channel1.Filter = CS_FILTER_OFF
-    channel1.Term = channel2.Term = CS_COUPLING_DC
-    #send values to driver and commit.
-    CsSet(gage)
-    commit(gage)
-end
 
-function untilReady(G::GageCard;to=1.0,interval=10e-6)
-    cb() = ccall((:CsGetStatus,csssm),Cint,(Cuint,),G.gagehandle) == 0
-    while true
-        cb() && break
-        hybrid_sleep(10e-6)
-        yield()
-    end
-end
-
-const acqMax = 1024
-const to = TimerOutput()
-timeit_debug_enabled() = false
 
 begin # acquire sychronization objects
     isAcquiring = Channel(1)

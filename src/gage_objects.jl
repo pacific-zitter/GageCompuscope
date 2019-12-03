@@ -187,24 +187,24 @@ end
 end
 
 
-function Base.convert(::Type{CSACQUISITIONCONFIG},x::AcquisitionCfg)
+function Base.convert(::Type{CSACQUISITIONCONFIG}, x::AcquisitionCfg)
     a = Int64[]
     foreach(fieldnames(AcquisitionCfg)) do f_name
-        push!(a,getfield(x,f_name))
+        push!(a, getfield(x, f_name))
     end
     CSACQUISITIONCONFIG(a...)
 end
-function Base.convert(::Type{CSCHANNELCONFIG},x::ChannelCfg)
+function Base.convert(::Type{CSCHANNELCONFIG}, x::ChannelCfg)
     a = Int64[]
     foreach(fieldnames(ChannelCfg)) do f_name
-        push!(a,getfield(x,f_name))
+        push!(a, getfield(x, f_name))
     end
     CSCHANNELCONFIG(a...)
 end
-function Base.convert(::Type{CSTRIGGERCONFIG},x::TriggerCfg)
+function Base.convert(::Type{CSTRIGGERCONFIG}, x::TriggerCfg)
     a = Int64[]
     foreach(fieldnames(TriggerCfg)) do f_name
-        push!(a,getfield(x,f_name))
+        push!(a, getfield(x, f_name))
     end
     CSTRIGGERCONFIG(a...)
 end

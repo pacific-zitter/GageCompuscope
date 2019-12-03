@@ -1,5 +1,3 @@
-
-
 const _csget = Dict(
     CSACQUISITIONCONFIG => CS_ACQUISITION,
     CSTRIGGERCONFIG => CS_TRIGGER,
@@ -7,6 +5,20 @@ const _csget = Dict(
     CSSYSTEMINFO => CS_BOARD_INFO,
 )
 
+function CsGetErrorString(i32ErrorCode)
+    buffer = Vector{UInt8}(undef, 256)
+    ccall(
+        (:CsGetErrorStringA, csssm),
+        Int32,
+        (Int32, Cstring, Cint),
+        i32ErrorCode,
+        pointer(buffer),
+        256,
+    )
+    unsafe_string(pointer(buffer))
+end
+
+cserror(code) = CsGetErrorString(code)
 
 function CsInitialize()
     ccall((:CsInitialize, csssm), Int32, ())
@@ -67,7 +79,6 @@ function CsGetSystemInfo(hSystem, pSystemInfo::T) where {T}
         pSystemInfo,
     )
 end
-CsGetSystemInfo(info) = CsGetSystemInfo(gagehandle[], info)
 
 function CsGetSystemCaps(hSystem, CapsId, pBuffer, BufferSize)
     ccall(
@@ -87,17 +98,6 @@ end
 
 function CsTransfer(hSystem, pInData, outData)
     ccall(
-        (:CsTransfer, csssm),
-        Int32,
-        (UInt32, Ptr{IN_PARAMS_TRANSFERDATA}, Ptr{OUT_PARAMS_TRANSFERDATA}),
-        hSystem,
-        pInData,
-        outData,
-    )
-end
-
-function CsTransfer_threadcall(hSystem, pInData, outData)
-    @threadcall(
         (:CsTransfer, csssm),
         Int32,
         (UInt32, Ptr{IN_PARAMS_TRANSFERDATA}, Ptr{OUT_PARAMS_TRANSFERDATA}),
@@ -129,18 +129,7 @@ function CsGetEventHandle(hSystem, u32EventType, phEvent)
         (UInt32, UInt32, Ptr{Ptr{Cvoid}}),
         hSystem,
         u32EventType,
-        phEvent
-    )
-end
-
-function event_handle(handle, eventtype, eventhandle)
-    Base.@threadcall(
-        (:CsGetEventHandle, csssm),
-        Int32,
-        (UInt32, UInt32, Ptr{Threads.Event}),
-        handle,
-        eventtype,
-        eventhandle,
+        phEvent,
     )
 end
 
@@ -148,28 +137,20 @@ function CsGetStatus(hSystem)
     @threadcall((:CsGetStatus, csssm), Int32, (UInt32,), hSystem)
 end
 
-function CsGetErrorString(i32ErrorCode)
-    buffer = Vector{UInt8}(undef, 256)
-    ccall(
-        (:CsGetErrorStringA, csssm),
-        Int32,
-        (Int32, Cstring, Cint),
-        i32ErrorCode,
-        pointer(buffer),
-        256,
-    )
-    unsafe_string(pointer(buffer))
-end
-
 function CsTransferAS(hSystem, pInData, pOutParams, pToken)
     @threadcall(
         (:CsTransferAS, csssm),
         Int32,
-        (UInt32, Ptr{IN_PARAMS_TRANSFERDATA}, Ptr{OUT_PARAMS_TRANSFERDATA}, Ptr{Cuint}),
+        (
+         UInt32,
+         Ptr{IN_PARAMS_TRANSFERDATA},
+         Ptr{OUT_PARAMS_TRANSFERDATA},
+         Ptr{Cuint},
+        ),
         hSystem,
         pInData,
         pOutParams,
-        pToken
+        pToken,
     )
 end
 

@@ -33,10 +33,6 @@ function getGageEvent(G::GageCard, eventType)
     return Q
 end
 
-# function setevent(eventhandle::Ptr{Cvoid})
-#     @ccall "kernel32".SetEvent(eventhandle::Ptr{Cvoid})::Cint
-# end
-
 const INFINITE = typemax(UInt32)
 function win32wait(event, timeout = INFINITE)
     y = ccall(

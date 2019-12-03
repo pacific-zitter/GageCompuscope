@@ -1,5 +1,3 @@
-cserror(code) = CsGetErrorString(code)
-
 mutable struct GageCard
     gagehandle::Cuint
     systeminfo::SystemInfo
