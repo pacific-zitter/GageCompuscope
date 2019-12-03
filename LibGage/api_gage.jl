@@ -126,12 +126,13 @@ function CsGetEventHandle(hSystem, u32EventType, phEvent)
     ccall(
         (:CsGetEventHandle, csssm),
         Int32,
-        (UInt32, UInt32, Ptr{Cvoid}),
+        (UInt32, UInt32, Ptr{Ptr{Cvoid}}),
         hSystem,
         u32EventType,
-        phEvent,
+        phEvent
     )
 end
+
 function event_handle(handle, eventtype, eventhandle)
     Base.@threadcall(
         (:CsGetEventHandle, csssm),
@@ -144,7 +145,7 @@ function event_handle(handle, eventtype, eventhandle)
 end
 
 function CsGetStatus(hSystem)
-    ccall((:CsGetStatus, csssm), Int32, (UInt32,), hSystem)
+    @threadcall((:CsGetStatus, csssm), Int32, (UInt32,), hSystem)
 end
 
 function CsGetErrorString(i32ErrorCode)

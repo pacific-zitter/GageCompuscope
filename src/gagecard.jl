@@ -49,7 +49,8 @@ function free_system(g::GageCard)
 end
 
 function start(g::GageCard)
-    CsDo(g.gagehandle, ACTION_START)
+    st = CsDo(g.gagehandle, ACTION_START)
+    st < 1 && error(cserror(st))
 end
 
 function abort(g::GageCard)
@@ -58,7 +59,8 @@ end
 
 function commit(g::GageCard; coerce = false)
     which_action = coerce ? ACTION_COMMIT_COERCE : ACTION_COMMIT
-    CsDo(g.gagehandle, which_action)
+    st = CsDo(g.gagehandle, which_action)
+    st < 1 && error(cserror(st))
 end
 
 function get_status(g::GageCard)
@@ -98,8 +100,10 @@ function set_samplerate(g::GageCard, samplerate)
 end
 
 const terminations = Dict("dc" => CS_COUPLING_DC, "ac" => CS_COUPLING_AC)
-const impedances =
-    Dict("low" => CS_REAL_IMP_50_OHM, "high" => CS_REAL_IMP_1M_OHM)
+const impedances = Dict(
+    "low" => CS_REAL_IMP_50_OHM,
+    "high" => CS_REAL_IMP_1M_OHM,
+)
 
 function set_channel!(
     g::GageCard,

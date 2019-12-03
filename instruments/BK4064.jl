@@ -16,17 +16,19 @@ function setfgen()
 
     # Channel 1 output.
     inst.write("c1:outp on,load,50")
-    inst.write("c1:bswv wvtp, arb")
-    inst.write("c1:arwv name, SNR")
+    inst.write("c1:bswv wvtp, sine")
     inst.write("c1:bswv amp, 1Vpp")
-    inst.write("c1:bswv frq, 75e3")
+    # inst.write("c1:bswv frq, 75e3")
+    inst.write("c1:bswv frq, 1e6")
 
     # Channel 2 output.
     inst.write("c2:outp on,load,50")
-    inst.write("c2:bswv wvtp, arb")
-    inst.write("c2:arwv name, SNR")
+    inst.write("c2:bswv wvtp, SINE")
     inst.write("c2:bswv amp, 1Vpp")
     inst.write("c2:bswv frq, 75e3")
 end
+setfgen()
+inst.query("c1:bswv?")
 
+inst.query("c1:outp?")
 end
